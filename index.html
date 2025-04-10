@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
 <link href="assets/images/favicon.png" rel="icon" />
-<title>PROGETTO XYZ</title>
+<title>PROGETTO Poker </title>
 <meta name="description" content="Your ThemeForest item Name and description">
 <meta name="author" content="harnishdesign.net">
 
@@ -83,20 +83,20 @@
    
         <section id="start">
         <h1>Documentazione</h1>
-        <h2>Nome del progetto</h2>
-        <p class="lead">Qui va una breve descrizione.</p>
+        <h2>Poker texas hold’em </h2>
+        <p class="lead">Realizzazione di un gioco, il poker, con la possibilità di registrare gli utenti, giocare dentro a sale create da un giocatore, con il salvataggio di un punteggio</p>
 		<hr>
 		<div class="row">
 			<div class="col-sm-6 col-lg-4">
 				<ul class="list-unstyled">
-					<li><strong>Classe/Anno:</strong> 5XXX - 24/25</li>
-					<li><strong>Author:</strong> Studente1, studente2, studente3</li>
+					<li><strong>Classe/Anno:</strong> 5B Inf - 24/25</li>
+					<li><strong>Author:</strong> Baez, Bayoumy, Palmieri, Prostoiu</li>
 				</ul>
 			</div>
 			<div class="col-sm-6 col-lg-4">
 				<ul class="list-unstyled">
-					<li><strong class="font-weight-700">Creato:</strong> 16 dicembre 2024</li>
-					<li><strong>Ultima modifica:</strong> 20 gennaio 2025</li>
+					<li><strong class="font-weight-700">Creato:</strong> 10 aprile 2025</li>
+					<li><strong>Ultima modifica:</strong> 11 aprile 2025</li>
 				</ul>
 			</div>
 		</div>
@@ -106,7 +106,34 @@
 
         <section id="architettura_informazione">
           <h2>Architettura informazione</h2>
-          <p class="lead">Qui va inserito un diagramma che rappresenta la struttura delle informazioni del progetto.</p>
+          <p class="lead"><pre>Login
+            └── Lobby
+                ├── Crea Stanza
+                ├── Unisciti a Stanza
+                │   └── Inserisci Codice
+                └── Stanza
+                    ├── Attendi Giocatori (2-6)
+                    ├── Avvia Partita (solo creatore)
+                    └── Abbandona
+                        ├── Se creatore → elimina stanza
+                          └── Giocatori → tornano alla lobby
+                        ├── Se giocatore → rientra in lobby
+                            └── Fold automatico nel gioco (anche se creatore)
+                            └── Gestione turni passa al secondo entrato ( se abbandona creatore)
+                    └── Partita
+                      ├── Pre-flop
+                      ├── Flop
+                      ├── Turn
+                      ├── River
+                      ├── Showdown
+                      └── Fine partita → ritorno alla stanza
+      </pre>
+      Gli utenti, si registrano e fanno l'accesso con le credenziali (nome utente e password). Una volta effettuato l'accesso, possono 
+      partecipare ad una stanza virtuale gia esistente oppure possono creare una stanza virtuale, dove possono entrare da altri 2 a 
+      massimo 6 giocatori. Solo il creatore della stanza, può avviare la lobby. Se il creatore elimina la stanza i giocatori tornano 
+      alla lobby oppure se il giocatore rientra viene messo all'interno del gioco e il turno passa a quello successivo. Una volta 
+      avviata la partita e quando terminata, tutti i giocatori ritornano alla stanza. Solo gli utenti registrati possono giocare
+                </p>
           
         </section>
         
@@ -121,7 +148,7 @@
 
         <section id="umlcasiduso">
           <h2>Diagramma di Casi d'uso</h2>
-          <p class="lead">Diagramma di casi d'uso non previsto.</p>
+          <p class="lead"><img src="https://i.postimg.cc/59sYXsLb/image.png"></a></p>
           
           
         </section>
@@ -148,7 +175,37 @@
 
         <section id="contenuti">
           <h2>Contenuti del progetto</h2>
-          <p class="lead">In questa sezione vanno inseriti i contenuti, organizzati in tabella e con un numero di immagini significative</p>
+          <p class="lead">Il progetto consiste nel gioco da tavolo POKER, nella sua versione texas hold’em.
+            Nella prima schermata si presenta un login, dei quali i dati sono salvati in remoto su un server, una volta effettuato con 
+            successo l’accesso il giocatore può scegliere se creare una stanza o unirsi ad una già esistente utilizzando un codice e 
+            quando poi si ha una stanza con almeno due giocatori (e ad un massimo di 6) il creatore della stanza può far iniziare la 
+            partita (gli altri giocatori non possono).
+            Se il creatore della stanza la abbandona prematuramente, il comando passa al secondo entrato nella stanza.
+            Una volta dentro si presenta la schermata del gioco, In questa versione del gioco, ogni partecipante riceve due carte 
+            coperte personali, chiamate hole cards, e condivide cinque carte comuni, distribuite scoperte al centro del tavolo. 
+            L’obiettivo è formare la migliore combinazione possibile di cinque carte, utilizzando una qualunque combinazione tra le 
+            proprie due carte e le carte comuni, al fine di vincere il piatto (pot), cioè l’insieme delle puntate effettuate dai 
+            giocatori.
+            Una partita si svolge in diverse fasi. Prima di tutto, viene assegnato il dealer button, che ruota in senso orario dopo 
+            ogni mano e determina l’ordine di distribuzione delle carte e delle puntate. I due giocatori alla sinistra del dealer sono 
+            obbligati a versare rispettivamente lo small blind e il big blind, due puntate iniziali forzate che servono a creare 
+            azione nel piatto.
+            Dopo i bui, inizia la distribuzione delle carte: ogni giocatore riceve due carte personali coperte. A questo punto parte 
+            il primo giro di puntate, detto pre-flop. I giocatori, a partire da quello alla sinistra del big blind, possono scegliere 
+            se passare la mano (fold), vedere la puntata (call) o rilanciare (raise).
+            Segue poi la fase del flop, in cui vengono scoperte le prime tre carte comuni al centro del tavolo. Dopo un secondo giro 
+            di puntate, si scopre la quarta carta comune, chiamata turn, seguita da un terzo giro di puntate. Infine viene rivelata la 
+            quinta e ultima carta comune, il river, che dà inizio all’ultimo giro di puntate.
+            Se al termine del river ci sono ancora più giocatori in gioco, si arriva allo showdown: ognuno mostra le proprie carte, e 
+            vince chi ha la combinazione più alta tra le classiche mani del poker, come coppia, doppia coppia, tris, scala, colore, 
+            full, poker, scala colore e scala reale. In alternativa, un giocatore può vincere prima dello showdown, costringendo tutti 
+            gli avversari a lasciare la mano attraverso un bluff ben piazzato o una puntata aggressiva.
+            Durante ogni fase, i giocatori possono scegliere tra diverse azioni strategiche: check (passare la parola senza puntare), 
+            call (vedere la puntata), raise (rilanciare) o fold (ritirarsi). 
+            L’andamento dei turni viene gestito dal creatore della stanza (o da chi gli succede in caso di abbandono).
+            Una volta terminata la partita si ritorna alla schermata della stanza con i giocatori già dentro.
+            Se un giocatore abbandona la partita durante essa, al suo turno verrà eseguito un Fold.
+            </p>
 
         </section>
 
@@ -156,7 +213,13 @@
 
         <section id="wireframes">
           <h2>Wireframes</h2>
-          <p class="lead">In questa sezione vanno inseriti i wireframes o la storyboard di progetto.</p>
+          <p class="lead">
+            <p><img src="https://i.postimg.cc/yxDVgyC8/image.png"></p>
+            <p><img src="https://i.postimg.cc/Y9s7HLLK/image.png"></p>
+            <p><img src="https://i.postimg.cc/vDRd1Rv0/image.png"></p>
+            <p><img src="https://i.postimg.cc/3rzyjdSc/image.png"></p>
+
+          </p>
 
            <hr class="divider">
 
