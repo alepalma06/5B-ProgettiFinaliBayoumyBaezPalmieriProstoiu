@@ -149,7 +149,39 @@
         <section id="umlcasiduso">
           <h2>Diagramma di Casi d'uso</h2>
           <p class="lead"><img src="https://i.postimg.cc/59sYXsLb/image.png"></a></p>
-          
+          <pre>
+            [Nuovo Utente]
+              └──> Registrarsi
+          </pre>
+          <br>
+          <pre>
+            [Utente Registrato - Player]
+              ├──> Accedere al sistema (Login)
+              ├──> Unirsi a una stanza
+                └── Inserire codice stanza
+              ├──> Abbandonare la stanza
+                └── Ritorno alla lobby
+              ├──> Partecipare alla partita (Dopo che il creatore la fa partire)
+                ├── Ricevere carte da gioco
+                ├── Visualizzare carte comuni
+                ├── Eseguire azione (Fold, Call, Raise, Check)
+                └── Mostrare carte allo showdown
+                └──> Abbandonare partita
+                  └── Fold automatico
+          </pre>
+          <br>
+          <pre>
+            [Utente Registrato - Creatore Stanza]
+              ├──> Accedere al sistema (Login)
+              ├──> Creare una stanza
+              ├──> Avviare partita
+              ├──> Gestire turni (dealer, blinds, ordine)
+              ├──> Abbandonare stanza
+                ├── Passaggio comando al secondo entrato
+                └── Fold automatico se in partita
+              └──> Fine partita
+                └── Ritorno alla stanza
+          </pre>
           
         </section>
 
