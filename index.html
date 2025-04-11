@@ -106,7 +106,8 @@
 
         <section id="architettura_informazione">
           <h2>Architettura informazione</h2>
-          <p class="lead"><pre>Login
+          <p class="lead"><pre>
+            Login
             └── Lobby
                 ├── Crea Stanza
                 ├── Unisciti a Stanza
@@ -128,24 +129,29 @@
                       ├── Showdown
                       └── Fine partita → ritorno alla stanza
       </pre>
-      Gli utenti, si registrano e fanno l'accesso con le credenziali (nome utente e password). Una volta effettuato l'accesso, possono 
-      partecipare ad una stanza virtuale gia esistente oppure possono creare una stanza virtuale, dove possono entrare da altri 2 a 
-      massimo 6 giocatori. Solo il creatore della stanza, può avviare la lobby. Se il creatore elimina la stanza i giocatori tornano 
-      alla lobby oppure se il giocatore rientra viene messo all'interno del gioco e il turno passa a quello successivo. Una volta 
-      avviata la partita e quando terminata, tutti i giocatori ritornano alla stanza. Solo gli utenti registrati possono giocare
+      Dopo aver effettuato il login, l’utente viene indirizzato alla lobby principale, che rappresenta il punto di accesso alle 
+      funzionalità di gioco. Da qui, può scegliere se creare una nuova stanza oppure unirsi a una stanza esistente. Nel caso in cui 
+      decida di unirsi a una stanza già creata, gli verrà richiesto di inserire un codice identificativo univoco per accedere. 
+      Una volta entrato nella stanza, il giocatore attende l’arrivo degli altri partecipanti, con un minimo di due e un massimo di 
+      sei giocatori totali. Durante questa fase di attesa, solo il creatore della stanza ha il permesso di avviare la partita, 
+      mentre gli altri devono attendere il suo comando. Ogni utente ha anche la possibilità di abbandonare la stanza in qualsiasi 
+      momento. Se a farlo è il creatore, la stanza viene automaticamente eliminata e tutti i giocatori vengono espulsi e riportati 
+      alla lobby. Se invece è un giocatore semplice ad abbandonare, questo viene reindirizzato alla lobby senza influenzare 
+      l'esistenza della stanza. In tutti i casi, l’abbandono di una stanza in cui è in corso una partita comporta un fold automatico, 
+      cioè il giocatore che esce rinuncia a partecipare alla mano in corso. Se ad abbandonare è proprio il creatore durante la 
+      partita, oltre al fold automatico, la gestione dei turni passa al secondo giocatore che era entrato nella stanza, 
+      garantendo la continuità del gioco. Quando la partita viene avviata, si procede attraverso le varie fasi classiche del gioco: 
+      pre-flop, flop, turn, river e infine showdown. Ogni fase rappresenta un momento specifico della mano e segue l’ordine 
+      tradizionale delle regole del poker. Al termine della mano, si accede alla fase conclusiva della partita e, una volta conclusa, 
+      tutti i partecipanti vengono automaticamente riportati nella stanza da cui era stata avviata.
                 </p>
-          
         </section>
         
 		<hr class="divider">
-
-
         <section id="UML">
               <h2>UML</h2>
               <p class="lead">Ecco i vari diagrammi UML</p>
-
             </section>
-
         <section id="umlcasiduso">
           <h2>Diagramma di Casi d'uso</h2>
           Solo se l'utente è registrato
@@ -183,15 +189,11 @@
               └──> Fine partita
                 └── Ritorno alla stanza
           </pre>
-          
         </section>
-
         <section id="umloggetti">
           <h2>Diagrammi di oggetti</h2>
-          <p class="lead">Qui vanno inseriti il diagramma di oggetti (immagini)</p>          
-
+          <p class="lead">Al momento non esistono i diagrammi di oggetti</p>          
         </section>
-
         <section id="umlstato">
           <h2>Diagrammi di Stato</h2>
           <p class="lead">
@@ -204,20 +206,13 @@
             <p>
               <img src="https://i.postimg.cc/44tpxMBZ/image.png"/>
             </p>
-          
-          
           </p>          
-
         </section>
-
         <section id="umlsequenza">
           <h2>Diagrammi di Sequenza</h2>
           <p class="lead"><img src="https://i.postimg.cc/d0t97BD6/image.png"/></p>          
-
         </section>
-
         <hr class="divider">
-
         <section id="contenuti">
           <h2>Contenuti del progetto</h2>
           <p class="lead">Il progetto consiste nel gioco da tavolo POKER, nella sua versione texas hold’em.
@@ -251,11 +246,8 @@
             Una volta terminata la partita si ritorna alla schermata della stanza con i giocatori già dentro.
             Se un giocatore abbandona la partita durante essa, al suo turno verrà eseguito un Fold.
             </p>
-
         </section>
-
-         <hr class="divider">
-
+        <hr class="divider">
         <section id="wireframes">
           <h2>Wireframes</h2>
           <p class="lead">
@@ -263,26 +255,19 @@
             <p><img src="https://i.postimg.cc/Y9s7HLLK/image.png"></p>
             <p><img src="https://i.postimg.cc/vDRd1Rv0/image.png"></p>
             <p><img src="https://i.postimg.cc/3rzyjdSc/image.png"></p>
-
           </p>
-
-           <hr class="divider">
-
+          <hr class="divider">
           <section id="progetto">
           <h2>Il progetto</h2>
           <p class="lead">Per ora non sono presenti credenziali</p>
-
             <section id="link">
             <h2>Link al progetto</h2>
             <a href="">Link al progetto</a>
             <br>
             <a href="https://www.canva.com/design/DAGkT3yZ4M8/pCq8GZ4KZEh8cek7jLDVyg/edit?utm_content=DAGkT3yZ4M8&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton" target="_blank">Link al powerpoint</a>
-
         </section>
-        
       </div>
     </div>
-	
   </div>
   <!-- Content end --> 
   
@@ -291,7 +276,7 @@
   <footer id="footer" class="section bg-dark footer-text-light">
     <div class="container">
       
-      <p class="text-center">ITT e LSSA "Molinari" - Milano <a href="progettimolinari.it">Progetti Molinari</a>. Tutti i diritti riservati</p>
+      <p class="text-center">ITT e LSSA "Molinari" - Milano <a href="https://www.progettimolinari.it">Progetti Molinari</a>. Tutti i diritti riservati</p>
 	  
     </div>
   </footer>
