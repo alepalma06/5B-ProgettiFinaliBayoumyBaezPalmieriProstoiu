@@ -22,10 +22,36 @@ export function socketMiddleware(socket) {
         sendMessage('join-room', { roomId, playerName });
     }
 
+    // Funzione per distribuire le carte
+    function distributeCards(roomId,codice) {
+        sendMessage('distribute-cards', { roomId,codice });
+    }
+
+    function infoRoom(roomId) {
+        sendMessage('info-room', { roomId });
+    }
+
+    function startGame(roomId) {
+        sendMessage('start-game', { roomId });
+    }
+
+    function confirmDraw(roomId, playerName) {
+        sendMessage('confirm-draw', { roomId , playerName});
+    }
+
+    function turnoClient(roomId, playerName ,scelta,first) {
+        sendMessage('turno-client', { roomId , playerName ,scelta,first});
+    }
+
     // Esponi queste funzioni per l'uso esterno
     return {
         createRoom,
         joinRoom,
+        distributeCards,
         onReceiveMessage,
+        infoRoom,
+        startGame,
+        confirmDraw,
+        turnoClient
     };
 }
