@@ -142,7 +142,7 @@ wss.on("connection", (ws) => {
                 console.log(data)
                 const room = rooms[data.roomId];
                 if (room) {
-                    const cardsDataTavolo = await drawCards(room.deckId, 3);
+                    const cardsDataTavolo = await drawCards(room.deckId, 5);
                     const cardsData = await drawCards(room.deckId, room.players.length * 2);
                     if (cardsData && cardsData.cards) {
                         let index = 0;
