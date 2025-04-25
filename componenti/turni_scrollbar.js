@@ -9,11 +9,14 @@ export const ScrollBarComponent = (parentElement) => {
         if (scelta === "fold"){
             template=template.replace("%scelta",`The player ${player} has folded`)
         }
-        if (scelta === "check"){
+        else if (scelta === "check"){
             template=template.replace("%scelta",`The player ${player} has checked`)
         }
-        if (scelta === "raise"){
+        else if (scelta === "raise"){
             template=template.replace("%scelta",`The player ${player} ha raised`)
+        }
+        else if (scelta === "call"){
+            template=template.replace("%scelta",`The player ${player} ha called`)
         }
         turno.textContent = template;
         count++;
