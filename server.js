@@ -3,6 +3,8 @@ const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
 const axios = require('axios');
+const { get } = require('https');
+const fs = require('fs').promises;
 
 const app = express();
 const server = http.createServer(app);
@@ -183,8 +185,21 @@ wss.on("connection", (ws) => {
     });
 });
 
+async function getConfiguration() {
+    try {
+        const conf = await fs.readFile(path.join(__dirname, 'public', 'conf.json'), 'utf-8');
+        return JSON.parse(conf);
+    } catch (error) {
+        console.error("Errore durante il caricamento della configurazione:", error);
+    }
+}
 // Imposta la porta per Heroku
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
-    console.log(`Server in ascolto sulla porta ${PORT}`);
-});
+async function startServer() {
+    const conf = await getConfiguration();
+    const PORT = conf.port;
+    server.listen(PORT, () => {
+        console.log(`Server in ascolto sulla porta ${PORT}`);
+    });
+}
+
+startServer()
