@@ -132,7 +132,7 @@ socket.onopen = () => {
             let template = "";
             response.cards_house.forEach(carta_house => {
                 let carta = '<img src="%carta"></img>';
-                carta = carta.replace("%carta",carta_house.image)
+                carta = carta.replace("%carta","../assets/images/back-card.png")
                 template += carta
             });
             carte_house.innerHTML = template

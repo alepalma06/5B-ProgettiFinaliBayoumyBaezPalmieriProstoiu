@@ -60,7 +60,8 @@ wss.on("connection", (ws) => {
                         deckId: deck.deck_id,
                         players: [],
                         cardsDistributed: {},
-                        conferma_pescata: []
+                        conferma_pescata: [],
+                        fish: []
                     };
                     console.log(`Stanza ${data.roomId} creata con mazzo ID: ${deck.deck_id}`);
                     ws.send(JSON.stringify({ type: 'room-created', roomId: data.roomId, success: true }));
@@ -71,6 +72,7 @@ wss.on("connection", (ws) => {
                 if (rooms[data.roomId]) {
                     rooms[data.roomId].players.push(data.playerName);
                     playerConnections[data.playerName] = ws;
+                    rooms[data.roomId].fish.push(250);
                     console.log(`${data.playerName} si è unito alla stanza ${data.roomId}`,rooms);
                     wss.clients.forEach(client => {
                         if (client.readyState === WebSocket.OPEN) {
@@ -156,7 +158,9 @@ wss.on("connection", (ws) => {
                                     type: 'cards-distributed',
                                     roomId: data.roomId,
                                     cards_player: room.cardsDistributed[player],
-                                    cards_house: cardsDataTavolo.cards
+                                    cards_house: cardsDataTavolo.cards,
+                                    turno: 0,
+                                    carte_scoperte: [false,false,false,false,false]
                                 }));
                             } else {
                                 console.log(`Errore: connessione non trovata per ${playerName}`);
@@ -175,6 +179,7 @@ wss.on("connection", (ws) => {
 
     ws.on("close", () => {
         console.log("Un giocatore si è disconnesso");
+
     });
 });
 
