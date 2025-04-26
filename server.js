@@ -5,11 +5,10 @@ const path = require('path');
 const axios = require('axios');
 const { get } = require('https');
 const fs = require('fs').promises;
-const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new Server(server);
+const wss = new WebSocket.Server({ server });
 
 // Serve i file statici dalla cartella 'public'
 app.use(express.static(path.join(__dirname, 'public')));

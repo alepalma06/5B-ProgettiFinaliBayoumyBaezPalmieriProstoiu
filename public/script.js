@@ -5,7 +5,7 @@ import { createNavigator } from "/componenti/navigator.js"
 import { socketMiddleware } from "/componenti/middleware.js";
 import { ScrollBarComponent } from "/componenti/turni_scrollbar.js";
 
-const socket = wss();
+const wss = new WebSocket.Server({ server });
 const scrollbar=ScrollBarComponent(document.querySelector("#turni"))
 // Quando il WebSocket si apre, inizializza il middleware
 socket.onopen = () => {
