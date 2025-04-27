@@ -130,10 +130,10 @@ io.on("connection", (socket) => {
     });
 
     socket.on("confirm-draw", (data) => {
-        if (rooms[data]) {
-            rooms[data].conferma_pescata.push(data.playerName);
-            if (rooms[data].conferma_pescata.length === rooms[data].players.length) {
-                io.to(data).emit('turno-server', { roomId: data, player: rooms[data].players[0] });
+        if (rooms[data.roomId]) {
+            rooms[data.roomId].conferma_pescata.push(data.codice);
+            if (rooms[data.roomId].conferma_pescata.length === rooms[data.roomId].players.length) {
+                io.to(data.roomId).emit('turno-server', { roomId: data.roomId, player: rooms[data.roomId].players[0] });
             }
         } else {
             socket.emit('error', { message: 'Stanza non trovata' });
@@ -149,13 +149,14 @@ io.on("connection", (socket) => {
     });
 
     socket.on("turno-client", (data) => {
+        console.log(data,rooms)
         if (rooms[data.roomId]) {
-            const currentPlayer = rooms[data.roomId].players.find(el => el === data.playerName);
+            const currentPlayer = rooms[data.roomId].players.find(el => el === data.codice);
             const index = rooms[data.roomId].players.indexOf(currentPlayer);
             const nextPlayer = (index + 1) % rooms[data.roomId].players.length;
             io.to(data.roomId).emit('turno-game', {
                 roomId: data.roomId,
-                player_attuale: data.playerName,
+                player_attuale: data.codice,
                 player_next: rooms[data.roomId].players[nextPlayer],
                 scelta: data.scelta
             });

@@ -96,7 +96,7 @@ socket.on("cards-distributed", (response) => {
     const password = document.querySelector("#password").value;
     const codice = `${nome}-${password}`;
 
-    socket.emit("confirm-draw", roomId, codice);
+    socket.emit("confirm-draw", {roomId, codice});
 });
 
 socket.on('room-informed', (response) => {
@@ -128,6 +128,27 @@ socket.on('room-informed', (response) => {
     }
 });
 
+socket.on("turno-server", (response) => {
+    const roomId = sessionStorage.getItem("currentRoom");
+    const nome = document.querySelector("#nome").value;
+    const password = document.querySelector("#password").value;
+    const codice = `${nome}-${password}`;
+    if(codice===response.player){
+        console.log("bottoni funzionante")
+        const buttons = document.querySelectorAll(".action-button");
+        buttons.forEach(button => {
+            button.disabled = false;
+            button.addEventListener("click", function() {
+                console.log(button.innerHTML.toLowerCase());
+                console.log("server",codice,button)
+                const scelta=button.innerHTML.toLowerCase()
+                const first = true
+                socket.emit("turno-client", {roomId, codice, scelta , first});
+                buttons.forEach(btn => btn.disabled = true);
+            }, { once: true });
+        });
+    }
+});
 
 // Ascolta "turno-game"
 socket.on("turno-game", (response) => {
@@ -145,7 +166,9 @@ socket.on("turno-game", (response) => {
         buttons.forEach(button => {
             button.disabled = false;
             button.addEventListener("click", () => {
-                socket.emit("turnoClient", roomId, codice, button.innerHTML.toLowerCase(), true);
+                const scelta=button.innerHTML.toLowerCase()
+                const first = true
+                socket.emit("turno-client", {roomId, codice, scelta , first});
                 buttons.forEach(btn => btn.disabled = true);
             }, { once: true });
         });
