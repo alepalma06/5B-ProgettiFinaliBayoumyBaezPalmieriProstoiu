@@ -1,14 +1,13 @@
 const express = require('express');
 const http = require('http');
-const WebSocket = require('ws');
+const { Server } = require('socket.io');
 const path = require('path');
 const axios = require('axios');
-const { get } = require('https');
 const fs = require('fs').promises;
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const io = new Server(server);
 
 // Serve i file statici dalla cartella 'public'
 app.use(express.static(path.join(__dirname, 'public')));
@@ -48,140 +47,112 @@ async function drawCards(deckId, count) {
     }
 }
 
-// Gestione delle connessioni WebSocket
-wss.on("connection", (ws) => {
+// Gestione delle connessioni Socket.IO
+io.on("connection", (socket) => {
     console.log("Un nuovo giocatore si è connesso!");
-
-    ws.on("message", async (message) => {
-        const data = JSON.parse(message);
-        switch (data.type) {
-            case 'create-room':
-                const deck = await createNewDeck();
-                if (deck && deck.deck_id) {
-                    rooms[data.roomId] = {
-                        deckId: deck.deck_id,
-                        players: [],
-                        cardsDistributed: {},
-                        conferma_pescata: [],
-                        fish: []
-                    };
-                    console.log(`Stanza ${data.roomId} creata con mazzo ID: ${deck.deck_id}`);
-                    ws.send(JSON.stringify({ type: 'room-created', roomId: data.roomId, success: true }));
-                }
-                break;
-
-            case 'join-room':
-                if (rooms[data.roomId]) {
-                    rooms[data.roomId].players.push(data.playerName);
-                    playerConnections[data.playerName] = ws;
-                    rooms[data.roomId].fish.push(250);
-                    console.log(`${data.playerName} si è unito alla stanza ${data.roomId}`,rooms);
-                    wss.clients.forEach(client => {
-                        if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({ type: 'room-joined', roomId: data.roomId, players: rooms[data.roomId].players, success:true}));
-                        }
-                    });
-                } else {
-                    ws.send(JSON.stringify({ type: 'error', message: 'Stanza non trovata' }));
-                }
-                break;
-            
-            case 'info-room':
-                console.log(data)
-                if (rooms[data.roomId]) {
-                    ws.send(JSON.stringify({ type: 'room-informed', roomId: data.roomId, players: rooms[data.roomId].players, success: true }));
-                } else {
-                    ws.send(JSON.stringify({ type: 'error', message: 'Stanza non trovata' }));
-                }
-                break;
-
-            case 'confirm-draw':
-                console.log(data)
-                if (rooms[data.roomId]) {
-                    rooms[data.roomId].conferma_pescata.push(data.playerName);
-                    console.log("pescato",rooms[data.roomId].conferma_pescata,rooms[data.roomId].players)
-                    if (rooms[data.roomId].conferma_pescata.length === rooms[data.roomId].players.length){
-                        console.log("ciao")
-                        wss.clients.forEach(client => {
-                            if (client.readyState === WebSocket.OPEN) {
-                                client.send(JSON.stringify({ type: 'turno-server', roomId: data.roomId, player: rooms[data.roomId].players[0]}));
-                            }
-                        });
-                    }
-                } else {
-                    ws.send(JSON.stringify({ type: 'error', message: 'Stanza non trovata' }));
-                }
-                break;
-
-            case 'start-game':
-                console.log(data)
-                if (rooms[data.roomId]) {
-                    wss.clients.forEach(client => {
-                        if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({ type: 'start-game', roomId: data.roomId, success:true}));
-                        }
-                    });
-                } else {
-                    ws.send(JSON.stringify({ type: 'error', message: 'Stanza non trovata' }));
-                }
-                break;
-
-            case 'turno-client':
-                console.log(data)
-                if (rooms[data.roomId]) {
-                    const attuale = rooms[data.roomId].players.find(el => el === data.playerName);
-                    const index = rooms[data.roomId].players.indexOf(attuale)
-                    const next_player = (index + 1) % rooms[data.roomId].players.length;
-                    wss.clients.forEach(client => {
-                        if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({ type: 'turno-game', roomId: data.roomId, player_attuale:data.playerName, player_next:rooms[data.roomId].players[next_player], scelta:data.scelta}));
-                        }
-                    });
-                } else {
-                    ws.send(JSON.stringify({ type: 'error', message: 'Stanza non trovata' }));
-                }
-                break;
-
-            case 'distribute-cards':
-                console.log(data)
-                const room = rooms[data.roomId];
-                if (room) {
-                    const cardsDataTavolo = await drawCards(room.deckId, 5);
-                    const cardsData = await drawCards(room.deckId, room.players.length * 2);
-                    if (cardsData && cardsData.cards) {
-                        let index = 0;
-                        room.players.forEach(player => {
-                            room.cardsDistributed[player] = cardsData.cards.slice(index, index + 2);
-                            index += 2;
-                            const playerWs = playerConnections[player];
-                            if (playerWs) {
-                                console.log(player)
-                                playerWs.send(JSON.stringify({
-                                    type: 'cards-distributed',
-                                    roomId: data.roomId,
-                                    cards_player: room.cardsDistributed[player],
-                                    cards_house: cardsDataTavolo.cards,
-                                    turno: 0,
-                                    carte_scoperte: [false,false,false,false,false]
-                                }));
-                            } else {
-                                console.log(`Errore: connessione non trovata per ${playerName}`);
-                            }
-                        });
-                    }
-                } else {
-                    ws.send(JSON.stringify({ type: 'error', message: 'Stanza non trovata' }));
-                }
-                break;
-
-            default:
-                ws.send(JSON.stringify({ type: 'error', message: 'Tipo di messaggio non valido' }));
+    socket.on("create-room", async (data) => {
+        const deck = await createNewDeck();
+        if (deck && deck.deck_id) {
+            rooms[data] = {
+                deckId: deck.deck_id,
+                players: [],
+                cardsDistributed: {},
+                conferma_pescata: [],
+                fish: []
+            };
+            socket.join(data); 
+            console.log(rooms)
+            console.log(`Stanza ${data} creata con mazzo ID: ${deck.deck_id}`);
+            socket.emit('room-created', { roomId: data, success: true });
         }
     });
 
-    ws.on("close", () => {
-        console.log("Un giocatore si è disconnesso");
+    socket.on("join-room", (data) => {
+        console.log(data)
+        if (rooms[data.roomId]) {
+            rooms[data.roomId].players.push(data.codice);
+            playerConnections[data.codice] = socket;
+            rooms[data.roomId].fish.push(250);// sbagliato da sistemare
+            socket.join(data.roomId);
+            console.log(`${data.codice} si è unito alla stanza ${data.roomId}`, rooms);
+            io.to(data.roomId).emit('room-joined', { roomId: data.roomId, players: rooms[data.roomId].players, success: true });
+        } else {
+            socket.emit('error', { message: 'Stanza non trovata' });
+        }
+    });
 
+    socket.on("info-room", (data) => {
+        if (rooms[data]) {
+            socket.emit('room-informed', { roomId: data, players: rooms[data].players, success: true });
+        } else {
+            socket.emit('error', { message: 'Stanza non trovata' });
+        }
+    });
+
+    socket.on("confirm-draw", (data) => {
+        if (rooms[data]) {
+            rooms[data].conferma_pescata.push(data.playerName);
+            if (rooms[data].conferma_pescata.length === rooms[data].players.length) {
+                io.to(data).emit('turno-server', { roomId: data, player: rooms[data].players[0] });
+            }
+        } else {
+            socket.emit('error', { message: 'Stanza non trovata' });
+        }
+    });
+
+    socket.on("start-game", (data) => {
+        if (rooms[data]) {
+            io.to(data).emit('start-game', { roomId: data, success: true });
+        } else {
+            socket.emit('error', { message: 'Stanza non trovata' });
+        }
+    });
+
+    socket.on("turno-client", (data) => {
+        if (rooms[data.roomId]) {
+            const currentPlayer = rooms[data.roomId].players.find(el => el === data.playerName);
+            const index = rooms[data.roomId].players.indexOf(currentPlayer);
+            const nextPlayer = (index + 1) % rooms[data.roomId].players.length;
+            io.to(data.roomId).emit('turno-game', {
+                roomId: data.roomId,
+                player_attuale: data.playerName,
+                player_next: rooms[data.roomId].players[nextPlayer],
+                scelta: data.scelta
+            });
+        } else {
+            socket.emit('error', { message: 'Stanza non trovata' });
+        }
+    });
+
+    socket.on("distribute-cards", async (data) => {
+        const room = rooms[data.roomId];
+        if (room) {
+            const cardsDataTavolo = await drawCards(room.deckId, 5);
+            const cardsData = await drawCards(room.deckId, room.players.length * 2);
+            if (cardsData && cardsData.cards) {
+                let index = 0;
+                room.players.forEach(player => {
+                    room.cardsDistributed[player] = cardsData.cards.slice(index, index + 2);
+                    index += 2;
+                    const playerSocket = playerConnections[player];
+                    if (playerSocket) {
+                        playerSocket.emit('cards-distributed', {
+                            roomId: data.roomId,
+                            cards_player: room.cardsDistributed[player],
+                            cards_house: cardsDataTavolo.cards,
+                            turno: 0,
+                            carte_scoperte: [false, false, false, false, false]
+                        });
+                    }
+                });
+            }
+        } else {
+            socket.emit('error', { message: 'Stanza non trovata' });
+        }
+    });
+
+    socket.on("disconnect", () => {
+        console.log("Un giocatore si è disconnesso");
     });
 });
 
@@ -193,6 +164,7 @@ async function getConfiguration() {
         console.error("Errore durante il caricamento della configurazione:", error);
     }
 }
+
 // Imposta la porta per Heroku
 async function startServer() {
     const conf = await getConfiguration();
@@ -202,4 +174,4 @@ async function startServer() {
     });
 }
 
-startServer()
+startServer();
