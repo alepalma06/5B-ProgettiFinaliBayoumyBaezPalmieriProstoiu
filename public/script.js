@@ -178,34 +178,54 @@ async function getConfiguration() {
 
 async function initialize() {
     try {
+        // Carica configurazione
         const conf = await getConfiguration();
+
+        // Aggiorna interfaccia utente
         createNavigator(document.querySelector(".poker-table"));
-        const Login = createLogin();
-        login_button.onclick = () => {
+        const Login = createLogin()
+        login_button.onclick = async () => {
             let Nome = document.querySelector("#nome").value;
             let Password = document.querySelector("#password").value;
-            Login.login(Nome, Password, conf["token"]).then((r) => {
-                if (r === true) {
-                    Login.sessionstorage();
-                }
-                let risposta = sessionStorage.getItem("login");
-                if (risposta === "true") {
+            const codice = Nome + "-" + Password;
+        
+            // Fai una richiesta al server per verificare le credenziali
+            try {
+                const response = await fetch("/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ username: Nome, password: Password })
+                });
+                const data = await response.json();
+        
+                if (data.success) {
+                    // Se la risposta è positiva, salva il login e prosegui
+                    sessionStorage.setItem("login", "true");
                     const name_giocatore = document.querySelector(".player-name");
                     window.location.href = "#stanze";
                     const fetchs = generateFetchComponent();
                     fetchs.setData(rooms, conf["token"], conf["key_utenti"]).then(() => {
                         fetchs.getData(conf["token"], conf["key_utenti"]).then((data) => {
-                            const codice = `${Nome}-${Password}`;
-                            name_giocatore.innerText = codice;
                             const utenteID = data[codice];
+                            name_giocatore.innerText = codice;
+                            console.log(utenteID);
                         });
                     });
+                } else {
+                    // Se le credenziali sono errate, mostra un messaggio di errore
+                    alert("Credenziali errate, riprova.");
                 }
-            });
+            } catch (error) {
+                console.error("Errore durante la verifica del login:", error);
+            }
         };
+        
     } catch (error) {
         console.error("Errore durante l'inizializzazione:", error);
     }
 }
+
 
 initialize();

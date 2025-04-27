@@ -9,6 +9,46 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+const database = require("./database");
+app.use(express.json());
+database.createTable();
+
+app.post("/insert", async (req, res) => {//per fare insert
+    const poker = req.body.poker;
+    try {
+      await database.insert(poker);
+      res.json({result: "ok"});
+    } catch (e) {
+      res.status(500).json({result: "ko"});
+    }
+  })
+
+app.get('/poker', async (req, res) => {//per leggere 
+    const list = await database.select();
+    res.json(list);
+});
+
+app.post("/login", async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        // Controlla se il nome utente esiste nel database
+        const result = await database.select();
+        const user = result.find((u) => u.username === username);
+
+        if (user && user.password === password) {
+            // Se il nome utente e la password sono corretti
+            res.json({ success: true });
+        } else {
+            // Se le credenziali non corrispondono
+            res.json({ success: false, message: "Credenziali errate." });
+        }
+    } catch (error) {
+        console.error("Errore nel login:", error);
+        res.status(500).json({ success: false, message: "Errore interno del server." });
+    }
+});
+
 // Serve i file statici dalla cartella 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -168,7 +208,7 @@ async function getConfiguration() {
 // Imposta la porta per Heroku
 async function startServer() {
     const conf = await getConfiguration();
-    const PORT = conf.port;
+    const PORT = conf.PORTA;
     server.listen(PORT, () => {
         console.log(`Server in ascolto sulla porta ${PORT}`);
     });
