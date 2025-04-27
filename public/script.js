@@ -4,7 +4,7 @@ import { createLogin } from "/componenti/login.js";
 import { createNavigator } from "/componenti/navigator.js"
 import { ScrollBarComponent } from "/componenti/turni_scrollbar.js";
 
-const socket = io('https://poker.babapapr.it');
+const socket = io();
 const scrollbar = ScrollBarComponent(document.querySelector("#turni"));
 
 socket.on("connect", () => {
