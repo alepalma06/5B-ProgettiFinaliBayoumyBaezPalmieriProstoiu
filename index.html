@@ -113,7 +113,7 @@
                 ├── Unisciti a Stanza
                 │   └── Inserisci Codice
                 └── Stanza
-                    ├── Attendi Giocatori (2-10)
+                    ├── Attendi Giocatori (2-6)
                     ├── Avvia Partita (solo creatore)
                     └── Abbandona
                         ├── Se creatore → elimina stanza
@@ -174,7 +174,7 @@
               ├──> Partecipare alla partita (Dopo che il creatore la fa partire)
                 ├── Ricevere carte da gioco
                 ├── Visualizzare carte comuni
-                ├── Eseguire azione (Fold, Call, Raise, Check)
+                ├── Eseguire azione (Fold, Call, Raise, Check,puntata libera)
                 └── Mostrare carte allo showdown
                 └──> Abbandonare partita
                   └── Fold automatico
@@ -201,13 +201,28 @@
           <h2>Diagrammi di Stato</h2>
           <p class="lead">
             <p>
-              <img src="https://i.postimg.cc/d0xGhcbQ/image.png"/>
+              <img src="https://i.postimg.cc/50vS1Ntb/image.png"/>
             </p>
             <br>
             <hr>
             <br>
             <p>
-              <img src="https://i.postimg.cc/44tpxMBZ/image.png"/>
+              <img src="https://i.postimg.cc/6qfV2jRP/image.png"/>
+            </p>
+            <hr>
+            <br>
+            <p>
+              <img src="https://i.postimg.cc/13t0XKzW/image.png"/>
+            </p>
+            <hr>
+            <br>
+            <p>
+              <img src="https://i.postimg.cc/tRNFzcZS/image.png"/>
+            </p>
+            <hr>
+            <br>
+            <p>
+              <img src="https://i.postimg.cc/cL23Hy2H/image.png"/>
             </p>
           </p>          
         </section>
@@ -221,7 +236,7 @@
           <p class="lead">Il progetto consiste nel gioco da tavolo POKER, nella sua versione texas hold’em.
             Nella prima schermata si presenta un login, dei quali i dati sono salvati in remoto su un server, una volta effettuato con 
             successo l’accesso il giocatore può scegliere se creare una stanza o unirsi ad una già esistente utilizzando un codice e 
-            quando poi si ha una stanza con almeno due giocatori (e ad un massimo di 10) il creatore della stanza può far iniziare la 
+            quando poi si ha una stanza con almeno due giocatori (e ad un massimo di 6) il creatore della stanza può far iniziare la 
             partita (gli altri giocatori non possono).
             Se il creatore della stanza la abbandona prematuramente, il comando passa al secondo entrato nella stanza.
             Una volta dentro si presenta la schermata del gioco, In questa versione del gioco, ogni partecipante riceve due carte 
@@ -235,7 +250,8 @@
             azione nel piatto.
             Dopo i bui, inizia la distribuzione delle carte: ogni giocatore riceve due carte personali coperte. A questo punto parte 
             il primo giro di puntate, detto pre-flop. I giocatori, a partire da quello alla sinistra del big blind, possono scegliere 
-            se passare la mano (fold), vedere la puntata (call) o rilanciare (raise).
+            se passare la mano (fold), vedere la puntata (call) o rilanciare (raise), se vedere le carte senza puntare(check), puntata libera maggiore
+            maggiore dell'ultima puntata.
             Segue poi la fase del flop, in cui vengono scoperte le prime tre carte comuni al centro del tavolo. Dopo un secondo giro 
             di puntate, si scopre la quarta carta comune, chiamata turn, seguita da un terzo giro di puntate. Infine viene rivelata la 
             quinta e ultima carta comune, il river, che dà inizio all’ultimo giro di puntate.
@@ -258,7 +274,8 @@
             <p><img src="https://i.postimg.cc/633pST63/image.png"></p>
             <p><img src="https://i.postimg.cc/mrhrptgr/image.png"></p>
             <p><img src="https://i.postimg.cc/PqBd6y76/image.png"></p>
-            <p><img src="https://i.postimg.cc/K88LFc86/image.png"></p>
+            <p><img src="https://i.postimg.cc/fbb5QKxj/image.png"></p>
+            <p><img src="https://i.postimg.cc/9FtB4SbY/image.png"></p>
           </p>
           <hr class="divider">
           <section id="progetto">
