@@ -1,30 +1,38 @@
 export const createFormLogin = (parentElement) => {
     return { 
-        render: (login,bottone_aggiungi) => {
+        render:(login) =>  {
+
             parentElement.innerHTML = 
-                `<div><input id="Nome" type="text" class="form-control"/></div>`+
-                `<div><input id="Password" type="password" class="form-control"/></div>`+
-                `<div><button/></div>`
-            document.querySelector("#Login").onclick = () => {
-                const Nome = document.querySelector("#Nome").value;
-                const Password = document.querySelector("#Password").value;
+                `<input id="nome" type="text" placeholder="Username" required>`+
+                `<input id="password" type="password" placeholder="Password" required>`+
+                `<button type="button" id="buttonlogin" class="bottoni_principali">Login</button>`+
+                `<p>Sei registrato? <a href="#" id="Registrati">Registrati</a></p>`;
+
+            document.querySelector("#buttonlogin").onclick = async() => {
+                const Nome = document.querySelector("#nome").value;
+                const Password = document.querySelector("#password").value;
                 console.log(Nome,Password)
                 if (Nome === "" || Password === "" ) {
                     outputform.innerHTML="ko";
                 }else{
-                    login.login(Nome,Password).then((r)=>{
-                        console.log(r)
-                        if(r===true){
-                            login.sessionstorage()
+                    try {
+                        const data = await login.login(Nome,Password)
+                        console.log(data)
+                        if (data === true) {
+                            // Se la risposta è positiva, salva il login e prosegui
+                            sessionStorage.setItem("login", "true");
+                            const name_giocatore = document.querySelector(".player-name");
+                            window.location.href = "#stanze";
+                            name_giocatore.innerText = Nome;
+                        } else {
+                            // Se le credenziali sono errate, mostra un messaggio di errore
+                            alert("Credenziali errate, riprova.");
                         }
-                        let risposta = sessionStorage.getItem("login");
-                        console.log(risposta)
-                        if (risposta==="true"){
-                            login.render(bottone_aggiungi)
-                        }
-                    })
+                    } catch (error) {
+                        console.error("Errore durante la verifica del login:", error);
+                    }
+                }
             }
         }
     }
-}
 }

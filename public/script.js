@@ -4,7 +4,6 @@ import { createNavigator } from "/componenti/navigator.js"
 import { ScrollBarComponent } from "/componenti/turni_scrollbar.js";
 
 const socket = io();
-const scrollbar = ScrollBarComponent(document.querySelector("#turni"));
 
 socket.on("connect", () => {
     console.log("Connesso al server");
@@ -198,34 +197,15 @@ async function initialize() {
     try {
         // Carica configurazione
         const conf = await getConfiguration();
-
-        // Aggiorna interfaccia utente
+        const Login = createLogin();
+        const scrollbar = ScrollBarComponent(document.querySelector("#turni"));
+        
         createNavigator(document.querySelector(".poker-table"));
-        const Login = createLogin()
-        const Form_Login = createFormLogin(document.querySelector("#formlogin"))
-        login_button.onclick = async () => {
-            let Nome = document.querySelector("#nome").value;
-            let Password = document.querySelector("#password").value;
-        
-            // Fai una richiesta al server per verificare le credenziali
-            try {
-                const data = await Login.login(Nome,Password)
-                console.log(data)
-                if (data === true) {
-                    // Se la risposta è positiva, salva il login e prosegui
-                    sessionStorage.setItem("login", "true");
-                    const name_giocatore = document.querySelector(".player-name");
-                    window.location.href = "#stanze";
-                    name_giocatore.innerText = Nome;
-                } else {
-                    // Se le credenziali sono errate, mostra un messaggio di errore
-                    alert("Credenziali errate, riprova.");
-                }
-            } catch (error) {
-                console.error("Errore durante la verifica del login:", error);
-            }
-        };
-        
+
+        //form login 
+        const Form_Login = createFormLogin(document.querySelector("#formlogin"));
+        Form_Login.render(Login);
+
     } catch (error) {
         console.error("Errore durante l'inizializzazione:", error);
     }
