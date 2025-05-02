@@ -2,6 +2,8 @@ import { createFormLogin } from "/componenti/form_login.js";
 import { createLogin } from "/componenti/login.js";
 import { createNavigator } from "/componenti/navigator.js"
 import { ScrollBarComponent } from "/componenti/turni_scrollbar.js";
+import { createFormRegister } from "/componenti/form_register.js";
+import { createRegister } from "/componenti/register.js";
 
 const socket = io();
 
@@ -198,6 +200,7 @@ async function initialize() {
         // Carica configurazione
         const conf = await getConfiguration();
         const Login = createLogin();
+        const Register = createRegister();
         const scrollbar = ScrollBarComponent(document.querySelector("#turni"));
         
         createNavigator(document.querySelector(".poker-table"));
@@ -205,6 +208,11 @@ async function initialize() {
         //form login 
         const Form_Login = createFormLogin(document.querySelector("#formlogin"));
         Form_Login.render(Login);
+        
+        //form register
+        const Form_register = createFormRegister(document.querySelector("#formregister"))
+        Form_register.render(Register)
+
 
     } catch (error) {
         console.error("Errore durante l'inizializzazione:", error);

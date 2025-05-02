@@ -6,7 +6,8 @@ export const createFormLogin = (parentElement) => {
                 `<input id="nome" type="text" placeholder="Username" required>`+
                 `<input id="password" type="password" placeholder="Password" required>`+
                 `<button type="button" id="buttonlogin" class="bottoni_principali">Login</button>`+
-                `<p>Sei registrato? <a href="#" id="Registrati">Registrati</a></p>`;
+                `<p>Sei registrato? <a href="#registrati" id="Registrati">Registrati</a></p>`+
+                `<p id="outputform"></p>`;
 
             document.querySelector("#buttonlogin").onclick = async() => {
                 const Nome = document.querySelector("#nome").value;

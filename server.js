@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 const axios = require('axios');
+const nodemailer = require("nodemailer");
 const fs = require('fs').promises;
 
 const app = express();
@@ -13,13 +14,27 @@ const database = require("./database");
 app.use(express.json());
 database.createTable();
 
+const transporter = nodemailer.createTransport({
+    host: "smtp.ionos.it",     
+    port: 587,                      
+    secure: false,                   
+    auth: {
+      user: "poker@babapapr.it",
+      pass: "ProgettoFinale2025@"
+    }
+});
+
 app.post("/insert", async (req, res) => {//per fare insert
-    const poker = req.body.poker;
+    const poker = req.body;
+    console.log(poker)
+    poker.fiches = 500
+    poker.password=await generapassword()
     try {
-      await database.insert(poker);
-      res.json({result: "ok"});
+        await database.insert(poker);
+        inviaEmail(poker)
+        res.json({result: "ok"});
     } catch (e) {
-      res.status(500).json({result: "ko"});
+        res.status(500).json({result: "ko"});
     }
   })
 
@@ -204,6 +219,29 @@ async function getConfiguration() {
     } catch (error) {
         console.error("Errore durante il caricamento della configurazione:", error);
     }
+}
+
+const generapassword = async ()=>{
+    let password = await fetch("https://makemeapassword.ligos.net/api/v1/pronounceable/json?")
+    password=await password.json()
+    return password.pws[0]
+}
+
+const inviaEmail = (body) =>{
+    const mailOptions = {
+        from: '"Babapapr.it" <poker@babapapr.it>',
+        to: body.email,
+        subject: "La tua nuova password",
+        text: `Ciao ${body.username}!\n\nEcco la tua nuova password: ${body.password}`
+      };
+      
+      // Invio
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          return console.error("Errore invio:", error);
+        }
+        console.log("Email inviata:", info.response);
+      });
 }
 
 // Imposta la porta per Heroku

@@ -33,10 +33,11 @@ const database = {
    //faccio insert nella tabella 
    insert: async (poker) => {
       let sql = `
-         INSERT INTO poker (username, password, fiches)
+         INSERT INTO poker (username, password, email, fiches)
          VALUES (
             '${poker.username}', 
             '${poker.password}', 
+            '${poker.email}', 
             '${poker.fiches}')`
       ;
       return await executeQuery(sql);
