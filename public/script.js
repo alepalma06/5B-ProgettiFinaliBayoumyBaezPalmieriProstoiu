@@ -1,4 +1,3 @@
-import { generateFetchComponent } from "/componenti/fetch_component.js";
 import { createFormLogin } from "/componenti/form_login.js";
 import { createLogin } from "/componenti/login.js";
 import { createNavigator } from "/componenti/navigator.js"
@@ -185,10 +184,6 @@ socket.on("error", (error) => {
 
 
 const login_button = document.querySelector("#buttonlogin");
-const rooms = {
-    "Nicolas-baez": "ID-0001",
-    "Vanessa-solis": "ID-0002"
-};
 
 async function getConfiguration() {
     try {
@@ -207,35 +202,21 @@ async function initialize() {
         // Aggiorna interfaccia utente
         createNavigator(document.querySelector(".poker-table"));
         const Login = createLogin()
+        const Form_Login = createFormLogin(document.querySelector("#formlogin"))
         login_button.onclick = async () => {
             let Nome = document.querySelector("#nome").value;
             let Password = document.querySelector("#password").value;
-            const codice = Nome + "-" + Password;
         
             // Fai una richiesta al server per verificare le credenziali
             try {
-                const response = await fetch("/login", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ username: Nome, password: Password })
-                });
-                const data = await response.json();
-        
-                if (data.success) {
+                const data = await Login.login(Nome,Password)
+                console.log(data)
+                if (data === true) {
                     // Se la risposta è positiva, salva il login e prosegui
                     sessionStorage.setItem("login", "true");
                     const name_giocatore = document.querySelector(".player-name");
                     window.location.href = "#stanze";
-                    const fetchs = generateFetchComponent();
-                    fetchs.setData(rooms, conf["token"], conf["key_utenti"]).then(() => {
-                        fetchs.getData(conf["token"], conf["key_utenti"]).then((data) => {
-                            const utenteID = data[codice];
-                            name_giocatore.innerText = codice;
-                            console.log(utenteID);
-                        });
-                    });
+                    name_giocatore.innerText = Nome;
                 } else {
                     // Se le credenziali sono errate, mostra un messaggio di errore
                     alert("Credenziali errate, riprova.");

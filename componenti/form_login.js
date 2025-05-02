@@ -2,8 +2,9 @@ export const createFormLogin = (parentElement) => {
     return { 
         render: (login,bottone_aggiungi) => {
             parentElement.innerHTML = 
-                `<div><p id="pnome" class="form-label">Nome</p><input id="Nome" type="text" class="form-control"/></div>`+
-                `<div><p id="ppassword" class="form-label">Password</p><input id="Password" type="password" class="form-control"/></div>`
+                `<div><input id="Nome" type="text" class="form-control"/></div>`+
+                `<div><input id="Password" type="password" class="form-control"/></div>`+
+                `<div><button/></div>`
             document.querySelector("#Login").onclick = () => {
                 const Nome = document.querySelector("#Nome").value;
                 const Password = document.querySelector("#Password").value;

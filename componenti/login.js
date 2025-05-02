@@ -1,26 +1,20 @@
 export const createLogin=()=>{
     sessionStorage.setItem("login", "false");
     return{
-        login:(nome,password,key)=>{
-            return new Promise((resolve, reject) => {
-                fetch("https://ws.cipiaceinfo.it/credential/login", { 
-                  method: "POST",
-                  headers: {
-                     "content-type": "application/json",
-                     "key": key
-                  },
-                  body: JSON.stringify({
-                     username: nome,
-                     password: password
-                  })
-                })
-                .then(r => r.json())
-                .then(r => {
-                    console.log(r.result)
-                     resolve(r.result); 
-                  })
-                .catch(reject);
-              })
+        async login(Nome,Password){
+            try {
+                const response = await fetch("/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ username: Nome, password: Password })
+                });
+                const data = await response.json();
+                return data.success;
+            } catch (error) {
+                console.error("Errore durante la verifica del login:", error);
+            }
         },
         sessionstorage:()=>{
             sessionStorage.setItem("login", "true");

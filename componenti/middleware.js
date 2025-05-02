@@ -1,9 +1,9 @@
 export function socketMiddleware(socket) {
-    load: async () => {//per caricare
-        const response = await fetch("/poker");//fa chiamata a tabella booking
+    async function load (){//per caricare
+        const response = await fetch("/poker");
         return await response.json();
     }
-    add: async (poker) => {//per inserire nella tabella
+    async function add (poker) {//per inserire nella tabella
         const response = await fetch("/insert", {
             method: 'POST',
             headers: {
@@ -12,7 +12,7 @@ export function socketMiddleware(socket) {
             body: JSON.stringify({ poker: poker })
         });
         return await response.json();
-    },
+    }
     // Funzione per inviare messaggi al server
     function sendMessage(type, data) {
         socket.send(JSON.stringify({ type, ...data }));
