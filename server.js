@@ -108,29 +108,30 @@ io.on("connection", (socket) => {
     socket.on("create-room", async (data) => {
         const deck = await createNewDeck();
         if (deck && deck.deck_id) {
-            rooms[data] = {
+            rooms[data.roomId] = {
                 deckId: deck.deck_id,
+                nameRoom: data.nomeStanza,
                 players: [],
                 cardsDistributed: {},
                 conferma_pescata: [],
                 fish: []
             };
-            socket.join(data); 
+            socket.join(data.roomId); 
             console.log(rooms)
-            console.log(`Stanza ${data} creata con mazzo ID: ${deck.deck_id}`);
-            socket.emit('room-created', { roomId: data, success: true });
+            console.log(`Stanza ${data.roomId} creata con mazzo ID: ${deck.deck_id}`);
+            socket.emit('room-created', { roomId: data.roomId, success: true });
         }
     });
 
     socket.on("join-room", (data) => {
         console.log(data)
         if (rooms[data.roomId]) {
-            rooms[data.roomId].players.push(data.codice);
-            playerConnections[data.codice] = socket;
+            rooms[data.roomId].players.push(data.nome);
+            playerConnections[data.nome] = socket;
             rooms[data.roomId].fish.push(250);// sbagliato da sistemare
             socket.join(data.roomId);
-            console.log(`${data.codice} si è unito alla stanza ${data.roomId}`, rooms);
-            io.to(data.roomId).emit('room-joined', { roomId: data.roomId, players: rooms[data.roomId].players, success: true });
+            console.log(`${data.nome} si è unito alla stanza ${data.roomId}`, rooms);
+            io.to(data.roomId).emit('room-joined', { roomId: data.roomId, nameRoom:rooms[data.roomId].nameRoom, players: rooms[data.roomId].players, success: true });
         } else {
             socket.emit('error', { message: 'Stanza non trovata' });
         }

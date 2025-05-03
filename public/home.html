@@ -35,18 +35,25 @@
             </div>
         </div>
         <div class="page" id="stanza_attesa">
-            <h1>Waiting Room</h1>
+            <h1 id="nomestanza"></h1>
+            <p id="codicestanza"></p>
             <div class="players_waiting">
             </div> 
             <button class="inizia_partita bottoni_principali d-none" type="button">Start</button>
             <div id="error-message"></div>
         </div>
         <div class="page" id="stanze">
-            <input type="text" id="codice_stanza" placeholder="Codice Stanza" class="poker-input">
+                       
             <div class="bottoni_stanze">
+                <input type="text" id="nome_stanza" placeholder="Nome Stanza" class="poker-input">
                 <button id="crea_stanza" class="poker-button"><span class="icon">♠</span>Crea Stanza</button>
+            </div>
+            
+            <div class="bottoni_stanze">
+                <input type="text" id="codice_stanza" placeholder="Codice Stanza" class="poker-input">
                 <button id="entra_stanza" class="poker-button"><span class="icon">♦</span>Entra in stanza</button>
             </div>
+            
         </div>
         <div class="page" id="partita">
             <div id="turni"></div>

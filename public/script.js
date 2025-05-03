@@ -7,29 +7,40 @@ import { createRegister } from "/componenti/register.js";
 
 const socket = io();
 
+const generacodice = async ()=>{
+    let password = await fetch("https://makemeapassword.ligos.net/api/v1/alphanumeric/json?")
+    password=await password.json()
+    return password.pws[0]
+}
+
+
 socket.on("connect", () => {
     console.log("Connesso al server");
 
     const createButton = document.querySelector("#crea_stanza");
     const joinButton = document.querySelector("#entra_stanza");
     const roomInput = document.querySelector("#codice_stanza");
+    const roomName = document.querySelector("#nome_stanza")
     const inizia_partita = document.querySelector(".inizia_partita");
+    const NameRoom = document.querySelector("#nomestanza")
+    const CodeRoom = document.querySelector("#codicestanza")
 
-    createButton.addEventListener("click", () => {
-        const roomId = roomInput.value.trim();
-        socket.emit("create-room", roomId);
+    createButton.addEventListener("click", async () => {
+        const roomId = await generacodice()
+        const nomeStanza = roomName.value
+        socket.emit("create-room", {roomId , nomeStanza});
         sessionStorage.setItem("currentRoom", roomId);
         console.log(`Richiesta creazione stanza ID: ${roomId}`);
         window.location.href = "#stanza_attesa";
+        NameRoom.innerText = nomeStanza
+        CodeRoom.innerText = "Codice: "+roomId
         inizia_partita.classList.remove("d-none");
     });
 
-    joinButton.addEventListener("click", () => {
+    joinButton.addEventListener("click", async () => {
         const roomId = roomInput.value.trim();
         const nome = document.querySelector("#nome").value;
-        const password = document.querySelector("#password").value;
-        const codice = `${nome}-${password}`;
-        socket.emit("join-room", { roomId, codice });
+        socket.emit("join-room", { roomId, nome });
         sessionStorage.setItem("currentRoom", roomId);
         console.log(`Richiesta unione stanza ID: ${roomId}`);
         window.location.href = "#stanza_attesa";
@@ -47,10 +58,8 @@ socket.on("room-created", (data) => {
     console.log(`Stanza creata con ID: ${data.roomId}`);
     const roomId = data.roomId;
     const nome = document.querySelector("#nome").value;
-    const password = document.querySelector("#password").value;
-    const codice = `${nome}-${password}`;
     sessionStorage.setItem("currentRoom", roomId);
-    socket.emit("join-room", { roomId, codice });
+    socket.emit("join-room", { roomId, nome });
 });
 
 // Ascolta "room-joined"
@@ -64,6 +73,10 @@ socket.on("room-joined", (response) => {
     });
     template = template.replace("%td", lista_p);
     player_waiting.innerHTML = template;
+    const NameRoom = document.querySelector("#nomestanza")
+    const CodeRoom = document.querySelector("#codicestanza")
+    NameRoom.innerText = response.nameRoom
+    CodeRoom.innerText = "Codice: "+response.roomId
 });
 
 // Ascolta "start-game"
@@ -182,9 +195,6 @@ socket.on("disconnect", () => {
 socket.on("error", (error) => {
     console.error("Errore Socket.IO:", error);
 });
-
-
-const login_button = document.querySelector("#buttonlogin");
 
 async function getConfiguration() {
     try {
