@@ -26,7 +26,7 @@ socket.on("connect", () => {
     const CodeRoom = document.querySelector("#codicestanza")
 
     createButton.addEventListener("click", async () => {
-        const roomId = await generacodice()
+        const roomId = await generacodice();
         const nomeStanza = roomName.value
         socket.emit("create-room", {roomId , nomeStanza});
         sessionStorage.setItem("currentRoom", roomId);
@@ -40,6 +40,7 @@ socket.on("connect", () => {
     joinButton.addEventListener("click", async () => {
         const roomId = roomInput.value.trim();
         const nome = document.querySelector("#nome").value;
+        sessionStorage.setItem("currentRoom", roomId);
         socket.emit("join-room", { roomId, nome });
         sessionStorage.setItem("currentRoom", roomId);
         console.log(`Richiesta unione stanza ID: ${roomId}`);
@@ -47,7 +48,7 @@ socket.on("connect", () => {
     });
 
     inizia_partita.addEventListener("click", () => {
-        const roomId = roomInput.value.trim();
+        const roomId = sessionStorage.getItem("currentRoom");
         console.log(roomId)
         socket.emit("info-room", roomId);
     });
@@ -120,12 +121,12 @@ socket.on('room-informed', (response) => {
         // Se il numero di giocatori è tra 2 e 10
         let errorMessage = document.getElementById("error-message");
         
-        if (response.players.length >= 2 && response.players.length <= 10) {
+        if (response.players.length >= 2 && response.players.length <= 6) {
             // Nascondi eventuali messaggi di errore
             errorMessage.textContent = "";
             errorMessage.style.display = "none";
 
-            const roomId = document.querySelector("#codice_stanza").value.trim(); // Ottieni l'ID della stanza
+            const roomId = sessionStorage.getItem("currentRoom");
             const codice = document.querySelector("#nome").value + '-' + document.querySelector("#password").value; // Codice del giocatore
             console.log("si gioca")
             // Invoca la funzione per avviare la partita
@@ -135,7 +136,7 @@ socket.on('room-informed', (response) => {
             socket.emit("distribute-cards",{roomId, codice});
         } else {
             // Mostra il messaggio di errore se il numero di giocatori non è valido
-            errorMessage.textContent = "Errore: il numero di giocatori deve essere tra 2 e 10.";
+            errorMessage.textContent = "Errore: il numero di giocatori deve essere tra 2 e 6.";
             errorMessage.style.display = "block";
         }
     }
