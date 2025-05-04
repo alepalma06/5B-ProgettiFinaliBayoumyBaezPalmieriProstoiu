@@ -134,6 +134,7 @@ io.on("connection", (socket) => {
             console.log(`${data.nome} si è unito alla stanza ${data.roomId}`, rooms);
             io.to(data.roomId).emit('room-joined', { roomId: data.roomId, nameRoom:rooms[data.roomId].nameRoom, players: rooms[data.roomId].players, success: true });
         } else {
+            socket.emit('room-joined-error');
             console.log(`${data.nome} ha tentato di unirsi alla stanza ${data.roomId} ma la partita è già iniziata`);
             socket.emit('error', { message: 'La partita è già iniziata' });
         }

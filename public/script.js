@@ -79,6 +79,11 @@ socket.on("room-joined", (response) => {
     CodeRoom.innerText = "Codice: "+response.roomId
 });
 
+socket.on("room-joined-error", () => {
+    const errorMessage = document.getElementById("error-message-stanze");
+    errorMessage.innerHTML = "<p>La partita è già iniziata</p>";
+});
+
 
 // Ascolta "start-game"
 socket.on("start-game", (response) => {
