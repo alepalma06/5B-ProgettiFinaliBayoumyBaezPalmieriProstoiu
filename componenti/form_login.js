@@ -7,11 +7,12 @@ export const createFormLogin = (parentElement) => {
                 `<input id="password" type="password" placeholder="Password" required>`+
                 `<button type="button" id="buttonlogin" class="bottoni_principali">Login</button>`+
                 `<p>Sei registrato? <a href="#registrati" id="Registrati">Registrati</a></p>`+
-                `<p id="outputform"></p>`;
+                `<p id="outputform" style="color: red "></p>`;
 
             document.querySelector("#buttonlogin").onclick = async() => {
                 const Nome = document.querySelector("#nome").value;
                 const Password = document.querySelector("#password").value;
+                const outputform = document.querySelector("#outputform")
                 console.log(Nome,Password)
                 if (Nome === "" || Password === "" ) {
                     outputform.innerHTML="ko";
@@ -25,9 +26,15 @@ export const createFormLogin = (parentElement) => {
                             const name_giocatore = document.querySelector(".player-name");
                             window.location.href = "#stanze";
                             name_giocatore.innerText = Nome;
+                            sessionStorage.setItem("NAME", Nome);
+                            document.querySelector("#nome").value =""
+                            document.querySelector("#password").value =""
+                            outputform.innerHTML = "";
                         } else {
                             // Se le credenziali sono errate, mostra un messaggio di errore
-                            alert("Credenziali errate, riprova.");
+                            outputform.innerHTML = "Credenziali errate. Riprova.";
+                            document.querySelector("#nome").value =""
+                            document.querySelector("#password").value =""
                         }
                     } catch (error) {
                         console.error("Errore durante la verifica del login:", error);

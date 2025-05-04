@@ -114,7 +114,8 @@ io.on("connection", (socket) => {
                 players: [],
                 cardsDistributed: {},
                 conferma_pescata: [],
-                fish: []
+                fish: [],
+                avviata: false,
             };
             socket.join(data.roomId); 
             console.log(rooms)
@@ -125,7 +126,7 @@ io.on("connection", (socket) => {
 
     socket.on("join-room", (data) => {
         console.log(data)
-        if (rooms[data.roomId]) {
+        if (rooms[data.roomId] && rooms[data.roomId].avviata === false) {
             rooms[data.roomId].players.push(data.nome);
             playerConnections[data.nome] = socket;
             rooms[data.roomId].fish.push(250);// sbagliato da sistemare
@@ -133,7 +134,8 @@ io.on("connection", (socket) => {
             console.log(`${data.nome} si è unito alla stanza ${data.roomId}`, rooms);
             io.to(data.roomId).emit('room-joined', { roomId: data.roomId, nameRoom:rooms[data.roomId].nameRoom, players: rooms[data.roomId].players, success: true });
         } else {
-            socket.emit('error', { message: 'Stanza non trovata' });
+            console.log(`${data.nome} ha tentato di unirsi alla stanza ${data.roomId} ma la partita è già iniziata`);
+            socket.emit('error', { message: 'La partita è già iniziata' });
         }
     });
 
@@ -158,6 +160,7 @@ io.on("connection", (socket) => {
 
     socket.on("start-game", (data) => {
         if (rooms[data]) {
+            rooms[data].avviata = true;
             io.to(data).emit('start-game', { roomId: data, success: true });
         } else {
             socket.emit('error', { message: 'Stanza non trovata' });

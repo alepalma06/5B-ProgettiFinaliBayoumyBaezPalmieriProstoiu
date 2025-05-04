@@ -28,23 +28,21 @@ socket.on("connect", () => {
     createButton.addEventListener("click", async () => {
         const roomId = await generacodice();
         const nomeStanza = roomName.value
-        socket.emit("create-room", {roomId , nomeStanza});
+        socket.emit("create-room", { roomId , nomeStanza});
         sessionStorage.setItem("currentRoom", roomId);
         console.log(`Richiesta creazione stanza ID: ${roomId}`);
         window.location.href = "#stanza_attesa";
         NameRoom.innerText = nomeStanza
-        CodeRoom.innerText = "Codice: "+roomId
+        CodeRoom.innerText = "Codice: "+roomId;
         inizia_partita.classList.remove("d-none");
     });
 
     joinButton.addEventListener("click", async () => {
         const roomId = roomInput.value.trim();
-        const nome = document.querySelector("#nome").value;
+        const nome = sessionStorage.getItem("NAME");
         sessionStorage.setItem("currentRoom", roomId);
         socket.emit("join-room", { roomId, nome });
-        sessionStorage.setItem("currentRoom", roomId);
         console.log(`Richiesta unione stanza ID: ${roomId}`);
-        window.location.href = "#stanza_attesa";
     });
 
     inizia_partita.addEventListener("click", () => {
@@ -58,13 +56,14 @@ socket.on("connect", () => {
 socket.on("room-created", (data) => {
     console.log(`Stanza creata con ID: ${data.roomId}`);
     const roomId = data.roomId;
-    const nome = document.querySelector("#nome").value;
+    const nome = sessionStorage.getItem("NAME");
     sessionStorage.setItem("currentRoom", roomId);
     socket.emit("join-room", { roomId, nome });
 });
 
 // Ascolta "room-joined"
 socket.on("room-joined", (response) => {
+    window.location.href = "#stanza_attesa";
     console.log("Sei entrato nella stanza", response);
     const player_waiting = document.querySelector(".players_waiting");
     let template = '<table id="table_waiting" class="table table-borderless"><thead><tr><td>Players</td></tr></thead><tbody>%td</tbody></table>';
@@ -79,6 +78,7 @@ socket.on("room-joined", (response) => {
     NameRoom.innerText = response.nameRoom
     CodeRoom.innerText = "Codice: "+response.roomId
 });
+
 
 // Ascolta "start-game"
 socket.on("start-game", (response) => {
@@ -106,9 +106,8 @@ socket.on("cards-distributed", (response) => {
     carte_mano.innerHTML = template;
 
     const roomId = sessionStorage.getItem("currentRoom");
-    const nome = document.querySelector("#nome").value;
-    const password = document.querySelector("#password").value;
-    const codice = `${nome}-${password}`;
+    const nome = sessionStorage.getItem("NAME");
+    const codice = `${nome}`;
 
     socket.emit("confirm-draw", {roomId, codice});
 });
@@ -127,7 +126,7 @@ socket.on('room-informed', (response) => {
             errorMessage.style.display = "none";
 
             const roomId = sessionStorage.getItem("currentRoom");
-            const codice = document.querySelector("#nome").value + '-' + document.querySelector("#password").value; // Codice del giocatore
+            const codice = sessionStorage.getItem("NAME");
             console.log("si gioca")
             // Invoca la funzione per avviare la partita
             socket.emit("start-game",roomId);
