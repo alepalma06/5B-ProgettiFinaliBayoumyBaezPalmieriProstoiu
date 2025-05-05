@@ -146,7 +146,8 @@ socket.on('room-informed', (response) => {
     }
 });
 
-socket.on("turno-server", (response) => {
+// Cancella Hazem
+socket.on("turno-server", (response) => { 
     const roomId = sessionStorage.getItem("currentRoom");
     const nome = document.querySelector("#nome").value;
     const password = document.querySelector("#password").value;
@@ -168,7 +169,7 @@ socket.on("turno-server", (response) => {
     }
 });
 
-// Ascolta "turno-game"
+// Cancella Hazem
 socket.on("turno-game", (response) => {
     console.log("Turno di gioco", response);
     const roomId = sessionStorage.getItem("currentRoom");
