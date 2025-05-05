@@ -206,7 +206,7 @@ body, html {
 #carte_house {
     display: flex;
     justify-content: center;
-    margin-top: 100px;
+    margin-top: 65px;
     width: 550px;
     background-color: #006400; 
     border-radius: 15px; 
@@ -218,7 +218,7 @@ body, html {
 #carte_mano {
     display: flex;
     justify-content: center;
-    margin-top: 100px;
+    margin-top: 60px;
     gap: 10px;
 }
 
@@ -320,4 +320,51 @@ body, html {
     width: 20px;
     height: 20px;
     border-radius: 2px;
+}
+
+#giocatori_container {
+    gap: 10px;
+    padding: 10px 0;
+    padding-top: 60px;
+}
+
+#giocatori_container .giocatore {
+    width: 80px;
+    background-color: #222;
+    color: white;
+    border-radius: 10px;
+    padding: 8px;
+    font-size: 0.9rem;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+#giocatori_container .giocatore .nome {
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#giocatori_container .giocatore .puntata {
+    margin-top: 5px;
+    display: inline-block;
+    background-color: gold;
+    color: black;
+    font-weight: bold;
+    padding: 3px 6px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+}
+
+#giocatori_container .giocatore .carte {
+    margin-top: 5px;
+    display: flex;
+}
+
+#giocatori_container .giocatore .carte img {
+    width: 32px;
+    margin: 0 1px;
+    border-radius: 4px;
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
 }
