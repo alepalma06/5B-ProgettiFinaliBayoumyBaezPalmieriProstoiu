@@ -14,15 +14,28 @@ const database = require("./database");
 app.use(express.json());
 database.createTable();
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.ionos.it",     
-    port: 587,                      
-    secure: false,                   
-    auth: {
-      user: "poker@babapapr.it",
-      pass: "ProgettoFinale2025@"
+async function getConfiguration() {
+    try {
+        const conf = await fs.readFile(path.join(__dirname, 'public', 'conf.json'), 'utf-8');
+        return JSON.parse(conf);
+    } catch (error) {
+        console.error("Errore durante il caricamento della configurazione:", error);
     }
-});
+}
+
+async function create_trasporter(){
+    const conf = await getConfiguration();
+    const transporter = nodemailer.createTransport({
+        host: "smtp.ionos.it",     
+        port: 587,                      
+        secure: false,                   
+        auth: {
+          user: conf.mail,
+          pass: conf.pass
+        }
+    })
+    return transporter
+}
 
 app.post("/insert", async (req, res) => {//per fare insert
     const poker = req.body;
@@ -217,22 +230,14 @@ io.on("connection", (socket) => {
     });
 });
 
-async function getConfiguration() {
-    try {
-        const conf = await fs.readFile(path.join(__dirname, 'public', 'conf.json'), 'utf-8');
-        return JSON.parse(conf);
-    } catch (error) {
-        console.error("Errore durante il caricamento della configurazione:", error);
-    }
-}
-
 const generapassword = async ()=>{
     let password = await fetch("https://makemeapassword.ligos.net/api/v1/pronounceable/json?")
     password=await password.json()
     return password.pws[0]
 }
 
-const inviaEmail = (body) =>{
+const inviaEmail = async (body) =>{
+    const transporter = await create_trasporter()
     const mailOptions = {
         from: '"Babapapr.it" <poker@babapapr.it>',
         to: body.email,

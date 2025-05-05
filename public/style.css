@@ -248,6 +248,32 @@ body, html {
     z-index: 1000;
 }
 
+.players{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 60px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+#carte_play {
+    display: flex;
+    justify-content: center;
+    margin-top: 1n0px;
+    gap: 10px;
+}
+
+#carte_play img {
+    width: 60px;
+    transition: transform 0.3s ease-in-out;
+}
+
+
 .logo {
     height: 40px;
     padding-right: 90px;
