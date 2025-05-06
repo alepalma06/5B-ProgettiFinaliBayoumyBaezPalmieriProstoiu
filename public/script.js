@@ -14,6 +14,28 @@ const generacodice = async ()=>{
     return password.pws[0]
 }
 
+function aggiornaGiocatori(players, showCards = false) {
+    let html = '';
+
+    players.forEach(player => {
+        html += `
+            <div class="giocatore">
+                <div class="nome">${player.nome}</div>
+                <div class="${showCards ? 'carte' : 'puntata'}">
+                    ${
+                        showCards
+                            ? `<img src="${player.carte[0]}" alt="Carta 1">
+                               <img src="${player.carte[1]}" alt="Carta 2">`
+                            : `${player.puntata} 💰`
+                    }
+                </div>
+            </div>
+        `;
+    });
+
+    document.getElementById('giocatori_container').innerHTML = html;
+}
+
 
 socket.on("connect", () => {
     console.log("Connesso al server");
@@ -147,7 +169,8 @@ socket.on('room-informed', (response) => {
     }
 });
 
-socket.on("turno-server", (response) => {
+// Cancella Hazem
+socket.on("turno-server", (response) => { 
     const roomId = sessionStorage.getItem("currentRoom");
     const nome = document.querySelector("#nome").value;
     const password = document.querySelector("#password").value;
@@ -169,7 +192,7 @@ socket.on("turno-server", (response) => {
     }
 });
 
-// Ascolta "turno-game"
+// Cancella Hazem
 socket.on("turno-game", (response) => {
     console.log("Turno di gioco", response);
     const roomId = sessionStorage.getItem("currentRoom");

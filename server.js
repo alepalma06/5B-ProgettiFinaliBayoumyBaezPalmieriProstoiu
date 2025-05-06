@@ -192,6 +192,7 @@ io.on("connection", (socket) => {
         }
     });
 
+    //cancella Hazem
     socket.on("turno-client", (data) => {
         console.log(data,rooms)
         if (rooms[data.roomId]) {
@@ -265,7 +266,7 @@ const inviaEmail = async (body) =>{
       });
 }
 
-// Imposta la porta per Heroku
+
 async function startServer() {
     const conf = await getConfiguration();
     const PORT = conf.PORTA;
