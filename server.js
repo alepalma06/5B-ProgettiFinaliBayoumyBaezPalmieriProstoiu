@@ -51,6 +51,17 @@ app.post("/insert", async (req, res) => {//per fare insert
     }
   })
 
+  app.post("/delete", async (req, res) => {//per fare remove
+    const poker = req.body;
+    console.log(poker)
+    try {
+        await database.delete(poker.username,poker.email);
+        res.json({result: "ok"});
+    } catch (e) {
+        res.status(500).json({result: "ko"});
+    }
+  })
+
 app.get('/poker', async (req, res) => {//per leggere 
     const list = await database.select();
     res.json(list);

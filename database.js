@@ -24,8 +24,10 @@ const database = {
       //creo tabella se nn esiste
       await executeQuery(`
          CREATE TABLE IF NOT EXISTS poker (
-         username VARCHAR(100) PRIMARY KEY NOT NULL,
-         password VARCHAR(100) NOT NULL,
+         id INT PRIMARY KEY NOT NULL,
+         username VARCHAR(255) NOT NULL,
+         password VARCHAR(255) NOT NULL,
+         email VARCHAR(255) UNIQUE KEY NOT NULL,
          fiches INT NOT NULL
          )`
       );
@@ -42,10 +44,10 @@ const database = {
       ;
       return await executeQuery(sql);
    },
-   delete: (id) => {//delete ma nn viene usato
+   delete: (username,email) => {//delete
       let sql = `
         DELETE FROM poker
-        WHERE username=${username}`
+        WHERE username='${username}' AND email='${email}'`
       ;
       return executeQuery(sql);
    },

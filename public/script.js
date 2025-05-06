@@ -4,6 +4,7 @@ import { createNavigator } from "/componenti/navigator.js"
 import { ScrollBarComponent } from "/componenti/turni_scrollbar.js";
 import { createFormRegister } from "/componenti/form_register.js";
 import { createRegister } from "/componenti/register.js";
+import { createFormRecupera } from "/componenti/form_recupera.js";
 
 const socket = io();
 
@@ -216,6 +217,7 @@ async function initialize() {
         const conf = await getConfiguration();
         const Login = createLogin();
         const Register = createRegister();
+        const Recupera=createFormRecupera()
         const scrollbar = ScrollBarComponent(document.querySelector("#turni"));
         
         createNavigator(document.querySelector(".poker-table"));
@@ -227,6 +229,10 @@ async function initialize() {
         //form register
         const Form_register = createFormRegister(document.querySelector("#formregister"))
         Form_register.render(Register)
+
+         //form recupera
+         const Form_recupera = createFormRecupera(document.querySelector("#formrecupera"))
+         Form_recupera.render(Register)
 
 
     } catch (error) {
