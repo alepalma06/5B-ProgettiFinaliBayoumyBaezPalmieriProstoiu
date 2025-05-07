@@ -192,7 +192,7 @@ io.on("connection", (socket) => {
         if (rooms[data]) {
             rooms[data].avviata = true;
             const primo_giocatore_index = rooms[data].partite_giocate % rooms[data].players.length;
-            io.to(data).emit('start-game', { roomId: data, primo:rooms[data].players[primo_giocatore_index], success: true });
+            io.to(data).emit('start-game', { roomId: data, primo:rooms[data].players[primo_giocatore_index], giocatori:rooms[data].players, success: true });
         } else {
             socket.emit('error', { message: 'Stanza non trovata' });
         }
@@ -226,6 +226,7 @@ io.on("connection", (socket) => {
 
     socket.on("giocata", (data) => {
         const room = rooms[data.roomId];
+        console.log(room)
         for (let i = 0; i < room.players.length; i++) {
             if (room.players[i] === data.nome) {
                 if (data.giocata === "fold") {
@@ -249,7 +250,7 @@ io.on("connection", (socket) => {
                     prossimo_giocatore = (prossimo_giocatore + 1) % room.players.length;
                 }
 
-                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore], ultima_puntata: room.ultima_puntata });
+                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata });
 
             }
         }

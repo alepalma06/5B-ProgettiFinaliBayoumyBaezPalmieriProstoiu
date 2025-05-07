@@ -21,10 +21,10 @@ const generacodice = async ()=>{
     return password.pws[0]
 }
 
-function aggiornaGiocatori(players, showCards = false) {
+function creaGiocatori(nome,players, showCards = false) {
     let html = '';
-
     players.forEach(player => {
+        if(player.nome!=nome){
         html += `
             <div class="giocatore">
                 <div class="nome">${player.nome}</div>
@@ -33,16 +33,35 @@ function aggiornaGiocatori(players, showCards = false) {
                         showCards
                             ? `<img src="${player.carte[0]}" alt="Carta 1">
                                <img src="${player.carte[1]}" alt="Carta 2">`
-                            : `${player.puntata} 💰`
+                            : `${player.puntata} `
                     }
                 </div>
+                <div>💰</div>
             </div>
-        `;
+        `;}
     });
 
     document.getElementById('giocatori_container').innerHTML = html;
 }
 
+function aggiornaGiocatore(nomeGiocatore, nuovaPuntata, nomeGiocatoreDiTurno) {
+    const giocatori = document.querySelectorAll('.giocatore');
+    giocatori.forEach(giocatore => {
+        const nome = giocatore.querySelector('.nome')?.textContent.trim();
+
+        if (nome === nomeGiocatore) {
+            const puntataDiv = giocatore.querySelector('.puntata');
+            if (puntataDiv) {
+                puntataDiv.textContent = nuovaPuntata;
+            }
+        }
+        if (nome === nomeGiocatoreDiTurno) {
+            giocatore.style.boxShadow = '0 0 15px 5px yellow';
+        } else {
+            giocatore.style.boxShadow = 'none';
+        }
+    });
+}
 
 socket.on("connect", () => {
     console.log("Connesso al server");
@@ -123,6 +142,11 @@ socket.on("start-game", (response) => {
         window.location.href = "#partita";
         const nome = sessionStorage.getItem("NAME");
         console.log(nome)
+        const puntate_iniziali = []
+        response.giocatori.forEach(player =>{
+            puntate_iniziali.push({nome:player,puntata:0})
+        })
+        creaGiocatori(nome,puntate_iniziali)
         if (response.primo == nome){
             GiocatoreComponent.mio_turno(socket,0)
         }
@@ -185,6 +209,7 @@ socket.on('room-informed', (response) => {
 socket.on("turno", (response) => {
     console.log("è il turno di: ",response.nome);
     const nome = sessionStorage.getItem("NAME");
+    aggiornaGiocatore(response.ultimo,response.ultima_puntata,response.nome)
     if (response.nome == nome) {
         GiocatoreComponent.mio_turno(socket,response.ultima_puntata)
     }

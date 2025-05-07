@@ -324,8 +324,10 @@ body, html {
 
 #giocatori_container {
     gap: 10px;
-    padding: 10px 0;
     padding-top: 60px;
+    padding-left: 30px;
+    padding-right: 30px;
+    
 }
 
 #giocatori_container .giocatore {
