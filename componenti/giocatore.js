@@ -9,8 +9,18 @@ export const createGiocatore = (parentElement) => {
                 `<input type="number" class="form-control form-control-sm d-inline-block w-auto ms-2" placeholder="2" id="puntata_libera"></input>` +
                 `<button class="btn btn-info action-button" id="allin">All In</button>` +
                 `<p id="fiches">Fiches</p>`;
+            const foldButton = document.querySelector("#fold");
+            const checkButton = document.querySelector("#check");
+            const callButton = document.querySelector("#call");
+            const raiseButton = document.querySelector("#raise");
+            const allinButton = document.querySelector("#allin");
+            foldButton.disabled = true;
+            checkButton.disabled = true;
+            callButton.disabled = true;
+            raiseButton.disabled = true;
+            allinButton.disabled = true;
         },
-        mio_turno: () => {
+        mio_turno: (socket) => {
             const foldButton = document.querySelector("#fold");
             const checkButton = document.querySelector("#check");
             const callButton = document.querySelector("#call");

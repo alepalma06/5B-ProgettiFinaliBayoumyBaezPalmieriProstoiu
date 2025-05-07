@@ -9,6 +9,12 @@ import { createGiocatore } from "/componenti/giocatore.js";
 
 const socket = io();
 
+//creazione del giocatore
+const Giocatore = document.querySelector("#azioni_giocatore");
+const GiocatoreComponent = createGiocatore(Giocatore);
+
+GiocatoreComponent.render();
+
 const generacodice = async ()=>{
     let password = await fetch("https://makemeapassword.ligos.net/api/v1/alphanumeric/json?")
     password=await password.json()
@@ -112,8 +118,13 @@ socket.on("room-joined-error", () => {
 // Ascolta "start-game"
 socket.on("start-game", (response) => {
     if (response.success) {
-        console.log("Partita iniziata");
+        console.log("Partita iniziata è il turno di: ",response.primo);
         window.location.href = "#partita";
+        const nome = sessionStorage.getItem("NAME");
+        console.log(nome)
+        if (response.primo == nome){
+            GiocatoreComponent.mio_turno(socket)
+        }
     } else {
         console.error("Errore nell'inizio della partita");
     }
@@ -209,13 +220,6 @@ async function initialize() {
          //form recupera
          const Form_recupera = createFormRecupera(document.querySelector("#formrecupera"))
          Form_recupera.render(Register)
-
-         //creazione del giocatore
-        const Giocatore = document.querySelector("#azioni_giocatore");
-        const GiocatoreComponent = createGiocatore(Giocatore);
-
-        GiocatoreComponent.render();
-
         
 
     } catch (error) {

@@ -186,7 +186,8 @@ io.on("connection", (socket) => {
     socket.on("start-game", (data) => {
         if (rooms[data]) {
             rooms[data].avviata = true;
-            io.to(data).emit('start-game', { roomId: data, success: true });
+            const primo_giocatore_index = rooms[data].partite_giocate % rooms[data].players.length;
+            io.to(data).emit('start-game', { roomId: data, primo:rooms[data].players[primo_giocatore_index], success: true });
         } else {
             socket.emit('error', { message: 'Stanza non trovata' });
         }
