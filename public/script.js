@@ -118,12 +118,13 @@ socket.on("room-joined-error", () => {
 // Ascolta "start-game"
 socket.on("start-game", (response) => {
     if (response.success) {
+        console.log("Partita iniziata con successo", response);
         console.log("Partita iniziata è il turno di: ",response.primo);
         window.location.href = "#partita";
         const nome = sessionStorage.getItem("NAME");
         console.log(nome)
         if (response.primo == nome){
-            GiocatoreComponent.mio_turno(socket)
+            GiocatoreComponent.mio_turno(socket,0)
         }
     } else {
         console.error("Errore nell'inizio della partita");
@@ -178,6 +179,16 @@ socket.on('room-informed', (response) => {
             errorMessage.textContent = "Errore: il numero di giocatori deve essere tra 2 e 6.";
             errorMessage.style.display = "block";
         }
+    }
+});
+
+socket.on("turno", (response) => {
+    console.log("è il turno di: ",response.nome);
+    const nome = sessionStorage.getItem("NAME");
+    if (response.nome == nome) {
+        GiocatoreComponent.mio_turno(socket,response.ultima_puntata)
+    } else {
+        GiocatoreComponent.render()
     }
 });
 

@@ -138,7 +138,10 @@ io.on("connection", (socket) => {
                 players: [],
                 cardsDistributed: {},
                 conferma_pescata: [],
-                fiches: [],
+                giocata: [],
+                in_gioco: [],
+                ultima_puntata: 0,
+                piatto: 0,
                 avviata: false,
                 partite_giocate: 0,
             };
@@ -153,6 +156,8 @@ io.on("connection", (socket) => {
         console.log(data)
         if (rooms[data.roomId] && rooms[data.roomId].avviata === false) {
             rooms[data.roomId].players.push(data.nome);
+            rooms[data.roomId].in_gioco.push(true);
+            rooms[data.roomId].giocata.push("none");
             playerConnections[data.nome] = socket;
             socket.join(data.roomId);
             console.log(`${data.nome} si è unito alla stanza ${data.roomId}`, rooms);
@@ -210,7 +215,6 @@ io.on("connection", (socket) => {
                             cards_player: room.cardsDistributed[player],
                             cards_house: cardsDataTavolo.cards,
                             turno: 0,
-                            carte_scoperte: [false, false, false]
                         });
                     }
                 });
@@ -219,6 +223,42 @@ io.on("connection", (socket) => {
             socket.emit('error', { message: 'Stanza non trovata' });
         }
     });
+
+    socket.on("giocata", (data) => {
+        const room = rooms[data.roomId];
+        for (let i = 0; i < room.players.length; i++) {
+            if (room.players[i] === data.nome) {
+                if (data.giocata === "fold") {
+                    room.giocata[i] = data.giocata;
+                    for (let j = 0; j < room.players.length; j++) {
+                        if (room.players[j] === data.nome) {
+                            room.in_gioco[j] = false;
+                        }
+                    }
+                } else if (data.giocata === "allin") {
+                    room.giocata[i] = data.giocata;
+                    room.in_gioco[j] = false;
+                    if ( data.puntata >= room.ultima_puntata) {
+                        room.ultima_puntata = data.puntata;
+                    }
+                } else {
+                    if (data.puntata > room.ultima_puntata) {
+                        room.ultima_puntata = data.puntata;
+                        room.giocata[i] = data.puntata;
+                    }
+                }
+                room.piatto += data.puntata;
+                let prossimo_giocatore = (i + 1) % room.players.length;
+                while (room.in_gioco[prossimo_giocatore] === false) {
+                    prossimo_giocatore = (prossimo_giocatore + 1) % room.players.length;
+                }
+
+                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore], ultima_puntata: room.ultima_puntata });
+
+            }
+        }
+    });
+
 
     socket.on("disconnect", () => {
         console.log("Un giocatore si è disconnesso");
