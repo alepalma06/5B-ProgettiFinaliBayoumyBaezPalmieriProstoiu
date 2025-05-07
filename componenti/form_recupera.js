@@ -5,7 +5,7 @@ export const createFormRecupera = (parentElement) => {
             parentElement.innerHTML = 
                 `<input id="nomerec" type="text" placeholder="Username" required>`+
                 `<input id="emailrec" type="email" placeholder="Email" required>`+
-                `<button type="button" id="buttonrecupera" class="bottoni_principali">Recupera</button>`+
+                `<button type="button" id="buttonrecupera" class="bottoni_principali">Recupera Password</button>`+
                 `<p>Hai un account? <a href="#home">Accedi</a></p>`+
                 `<p id="outputformrecupera"></p>`;
 

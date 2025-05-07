@@ -7,7 +7,7 @@ export const createFormLogin = (parentElement) => {
                 `<input id="password" type="password" placeholder="Password" required>`+
                 `<button type="button" id="buttonlogin" class="bottoni_principali">Login</button>`+
                 `<p>Non sei registrato? <a href="#registrati" id="Registrati">Registrati</a></p>`+
-                `<p>Non ti ricordi la password? <a href="#recupera" id="recupera">Recupera password</a></p>`+
+                `<p>Non ti ricordi la password? <a href="#recupera" id="recupera">Recupera</a></p>`+
                 `<p id="outputform" style="color: red "></p>`;
 
             document.querySelector("#buttonlogin").onclick = async() => {
