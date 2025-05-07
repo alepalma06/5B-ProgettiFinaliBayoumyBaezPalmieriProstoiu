@@ -230,14 +230,10 @@ io.on("connection", (socket) => {
             if (room.players[i] === data.nome) {
                 if (data.giocata === "fold") {
                     room.giocata[i] = data.giocata;
-                    for (let j = 0; j < room.players.length; j++) {
-                        if (room.players[j] === data.nome) {
-                            room.in_gioco[j] = false;
-                        }
-                    }
+                    room.in_gioco[i] = false;
                 } else if (data.giocata === "allin") {
                     room.giocata[i] = data.giocata;
-                    room.in_gioco[j] = false;
+                    room.in_gioco[i] = false;
                     if ( data.puntata >= room.ultima_puntata) {
                         room.ultima_puntata = data.puntata;
                     }

@@ -187,8 +187,6 @@ socket.on("turno", (response) => {
     const nome = sessionStorage.getItem("NAME");
     if (response.nome == nome) {
         GiocatoreComponent.mio_turno(socket,response.ultima_puntata)
-    } else {
-        GiocatoreComponent.render()
     }
 });
 
