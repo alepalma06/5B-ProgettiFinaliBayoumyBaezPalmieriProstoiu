@@ -13,7 +13,6 @@ const socket = io();
 const Giocatore = document.querySelector("#azioni_giocatore");
 const GiocatoreComponent = createGiocatore(Giocatore);
 
-GiocatoreComponent.render();
 
 const generacodice = async ()=>{
     let password = await fetch("https://makemeapassword.ligos.net/api/v1/alphanumeric/json?")
@@ -254,7 +253,8 @@ async function initialize() {
          //form recupera
          const Form_recupera = createFormRecupera(document.querySelector("#formrecupera"))
          Form_recupera.render(Register)
-        
+
+        GiocatoreComponent.render();
 
     } catch (error) {
         console.error("Errore durante l'inizializzazione:", error);
