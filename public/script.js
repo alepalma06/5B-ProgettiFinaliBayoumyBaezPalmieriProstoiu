@@ -5,6 +5,7 @@ import { ScrollBarComponent } from "/componenti/turni_scrollbar.js";
 import { createFormRegister } from "/componenti/form_register.js";
 import { createRegister } from "/componenti/register.js";
 import { createFormRecupera } from "/componenti/form_recupera.js";
+import { createGiocatore } from "/componenti/giocatore.js";
 
 const socket = io();
 
@@ -257,6 +258,13 @@ async function initialize() {
          const Form_recupera = createFormRecupera(document.querySelector("#formrecupera"))
          Form_recupera.render(Register)
 
+         //creazione del giocatore
+        const Giocatore = document.querySelector("#azioni_giocatore");
+        const GiocatoreComponent = createGiocatore(Giocatore);
+
+        GiocatoreComponent.render();
+
+        
 
     } catch (error) {
         console.error("Errore durante l'inizializzazione:", error);

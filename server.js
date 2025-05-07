@@ -138,8 +138,9 @@ io.on("connection", (socket) => {
                 players: [],
                 cardsDistributed: {},
                 conferma_pescata: [],
-                fish: [],
+                fiches: [],
                 avviata: false,
+                partite_giocate: 0,
             };
             socket.join(data.roomId); 
             console.log(rooms)
@@ -153,7 +154,6 @@ io.on("connection", (socket) => {
         if (rooms[data.roomId] && rooms[data.roomId].avviata === false) {
             rooms[data.roomId].players.push(data.nome);
             playerConnections[data.nome] = socket;
-            rooms[data.roomId].fish.push(250);// sbagliato da sistemare
             socket.join(data.roomId);
             console.log(`${data.nome} si è unito alla stanza ${data.roomId}`, rooms);
             io.to(data.roomId).emit('room-joined', { roomId: data.roomId, nameRoom:rooms[data.roomId].nameRoom, players: rooms[data.roomId].players, success: true });
@@ -227,7 +227,7 @@ io.on("connection", (socket) => {
                             cards_player: room.cardsDistributed[player],
                             cards_house: cardsDataTavolo.cards,
                             turno: 0,
-                            carte_scoperte: [false, false, false, false, false]
+                            carte_scoperte: [false, false, false]
                         });
                     }
                 });
