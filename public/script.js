@@ -170,54 +170,6 @@ socket.on('room-informed', (response) => {
     }
 });
 
-// Cancella Hazem
-socket.on("turno-server", (response) => { 
-    const roomId = sessionStorage.getItem("currentRoom");
-    const nome = document.querySelector("#nome").value;
-    const password = document.querySelector("#password").value;
-    const codice = `${nome}-${password}`;
-    if(codice===response.player){
-        console.log("bottoni funzionante")
-        const buttons = document.querySelectorAll(".action-button");
-        buttons.forEach(button => {
-            button.disabled = false;
-            button.addEventListener("click", function() {
-                console.log(button.innerHTML.toLowerCase());
-                console.log("server",codice,button)
-                const scelta=button.innerHTML.toLowerCase()
-                const first = true
-                socket.emit("turno-client", {roomId, codice, scelta , first});
-                buttons.forEach(btn => btn.disabled = true);
-            }, { once: true });
-        });
-    }
-});
-
-// Cancella Hazem
-socket.on("turno-game", (response) => {
-    console.log("Turno di gioco", response);
-    const roomId = sessionStorage.getItem("currentRoom");
-    const nome = document.querySelector("#nome").value;
-    const password = document.querySelector("#password").value;
-    const codice = `${nome}-${password}`;
-
-    const scrollbar = ScrollBarComponent(document.querySelector("#turni"));
-    scrollbar.aggiungi_turno(response.player_attuale, response.scelta);
-
-    if (codice === response.player_next) {
-        const buttons = document.querySelectorAll(".action-button");
-        buttons.forEach(button => {
-            button.disabled = false;
-            button.addEventListener("click", () => {
-                const scelta=button.innerHTML.toLowerCase()
-                const first = true
-                socket.emit("turno-client", {roomId, codice, scelta , first});
-                buttons.forEach(btn => btn.disabled = true);
-            }, { once: true });
-        });
-    }
-});
-
 socket.on("disconnect", () => {
     console.log("Connessione chiusa");
 });

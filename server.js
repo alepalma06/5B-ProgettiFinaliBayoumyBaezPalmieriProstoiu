@@ -192,24 +192,6 @@ io.on("connection", (socket) => {
         }
     });
 
-    //cancella Hazem
-    socket.on("turno-client", (data) => {
-        console.log(data,rooms)
-        if (rooms[data.roomId]) {
-            const currentPlayer = rooms[data.roomId].players.find(el => el === data.codice);
-            const index = rooms[data.roomId].players.indexOf(currentPlayer);
-            const nextPlayer = (index + 1) % rooms[data.roomId].players.length;
-            io.to(data.roomId).emit('turno-game', {
-                roomId: data.roomId,
-                player_attuale: data.codice,
-                player_next: rooms[data.roomId].players[nextPlayer],
-                scelta: data.scelta
-            });
-        } else {
-            socket.emit('error', { message: 'Stanza non trovata' });
-        }
-    });
-
     socket.on("distribute-cards", async (data) => {
         const room = rooms[data.roomId];
         if (room) {
