@@ -5,6 +5,7 @@ const path = require('path');
 const axios = require('axios');
 const nodemailer = require("nodemailer");
 const fs = require('fs').promises;
+const { Hand } = require('pokersolver');
 
 const app = express();
 const server = http.createServer(app);
@@ -13,6 +14,12 @@ const io = new Server(server);
 const database = require("./database");
 app.use(express.json());
 database.createTable();
+
+async function vincitore(tavolo,players) {
+    players.forEach(player=>{
+        
+    })
+}
 
 async function getConfiguration() {
     try {
