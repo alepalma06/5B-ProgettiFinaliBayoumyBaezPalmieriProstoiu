@@ -110,7 +110,7 @@ async function initialize() {
                 response.giocatori.forEach(player =>{
                     puntate_iniziali.push({nome:player,puntata:0})
                 })
-                Partita.creaGiocatori(nome,puntate_iniziali)
+                Partita.creaGiocatori(puntate_iniziali)
                 Partita.aggiornaGiocatore(nome, 0, nome)
                 if (response.primo == nome){
                     GiocatoreComponent.movimenti_non_permessi(response.movimenti_non_permessi)
@@ -153,8 +153,16 @@ async function initialize() {
         socket.on("turno", (response) => {
             console.log(response)
             console.log("è il turno di: ",response.nome);
+            const ultima_puntata= response.ultima_puntata.toString()
             const nome = sessionStorage.getItem("NAME");
-            Partita.aggiornaGiocatore(response.ultimo,response.ultima_puntata,response.nome)
+            if (ultima_puntata.includes("fold")){
+                Partita.aggiornaGiocatore(response.ultimo,"fold",response.nome)
+                response.ultima_puntata=parseInt(response.ultima_puntata.replace("fold",""));
+            }
+            else{
+                Partita.aggiornaGiocatore(response.ultimo,response.ultima_puntata,response.nome)
+                response.ultima_puntata=parseInt(response.ultima_puntata);
+            }
             if (response.nome == nome) {
                 GiocatoreComponent.movimenti_non_permessi(response.movimenti_non_permessi)
                 GiocatoreComponent.mio_turno(socket,response.ultima_puntata)
@@ -173,6 +181,17 @@ async function initialize() {
             });
         });
         
+        socket.on("fine-partita", (response) => {
+            console.log(response);
+            let players = Object.entries(response.carte_giocatori).map(([nome, carte]) => {
+            return {
+                nome,
+                carte: carte.map(c => c.image)
+            };
+            });
+            Partita.creaGiocatori(players,true)
+        });
+
         socket.on("disconnect", () => {
             console.log("Connessione chiusa");
         });

@@ -62,9 +62,7 @@ export const createGiocatore = (parentElement) => {
             }
         },
         mio_turno: (socket, ult_pun) => {
-            if(ult_pun!="fold" && ult_pun!="call"){
-                ultima_puntata=ult_pun // io passo ultima puntata ma se è fold mantiene quella precedente per i calcoli
-            }
+            ultima_puntata=ult_pun
             console.log("mioturno",ult_pun,ultima_puntata)
             const messaggio = document.getElementById("messaggio");
             const foldButton = document.querySelector("#fold");
@@ -79,7 +77,7 @@ export const createGiocatore = (parentElement) => {
                 callButton.disabled = true;
                 raiseButton.disabled = true;
                 allinButton.disabled = true;
-                socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "fold" , puntata: 0 });
+                socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "fold" , puntata: ultima_puntata });
                 console.log("Fold eseguito");
                 messaggio.innerHTML = "";
             };
@@ -90,7 +88,7 @@ export const createGiocatore = (parentElement) => {
                 callButton.disabled = true;
                 raiseButton.disabled = true;
                 allinButton.disabled = true;
-                socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "check" , puntata: 0 });
+                socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "check" , puntata: ultima_puntata });
                 console.log("Check eseguito");
                 messaggio.innerHTML = "";
             };
@@ -113,7 +111,7 @@ export const createGiocatore = (parentElement) => {
                         puntataLibera = ultima_puntata;
                     }
                 }
-                fiches-=puntataLibera
+                fiches=fiches+ultima_puntata-puntataLibera
                 document.querySelector("#fiches").innerHTML = "Fiches: " + fiches;
                 socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "call" , puntata: puntataLibera });
                 console.log("Call eseguito");

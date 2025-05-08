@@ -16,13 +16,32 @@ const database = require("./database");
 app.use(express.json());
 database.createTable();
 
-async function vincitore(tavolo,players) {
+async function Vincitore(tavolo,players) {
     const giocatori_in_finale = []
+    const tav = tavolo.map(t => {
+        return t.code.replace("0", "T").toLowerCase();
+    });
+    console.log(tav)
     players.forEach((player,index)=>{
-        giocatori_in_finale[index]= Hand.solve([player.cards[0],player.cards[1],tavolo]);
+        giocatori_in_finale[index] = Hand.solve([
+        player.cards[0].code.replace("0", "T").toLowerCase(),
+        player.cards[1].code.replace("0", "T").toLowerCase(),
+        ...tav]);
     })
     const winners = Hand.winners(giocatori_in_finale);
     console.log(winners)
+    // Trova i nomi dei vincitori
+    const vincitori_con_nome = winners.map(w => {
+        const index = giocatori_in_finale.indexOf(w);
+        return {
+            nome: players[index].nome,
+            descrizione: w.descr,
+            carte: w.cards.map(c => c.value + c.suit) 
+        };
+    });
+
+    console.log(vincitori_con_nome);
+    return vincitori_con_nome;
 }
 
 async function getConfiguration() {
@@ -287,14 +306,14 @@ io.on("connection", (socket) => {
                     }
                     if(controllo_mancanti===true){
                         if (ultimaGiocata!="check"){
-                            if(room.mancaturno[room.player.length-1]===false){ // questo controlla se è il secondo giro, se si non si può più fare ne raise ne all in
-                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:["check","raise","all in"]});
+                            if(room.mancaturno[room.players.length-1]===false){ // questo controlla se è il secondo giro, se si non si può più fare ne raise ne all in
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: data.puntata+"fold",movimenti_non_permessi:["check","raise","all in"]});
                             }
                             else{
-                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:["check"]});
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: data.puntata+"fold",movimenti_non_permessi:["check"]});
                             }  
                         }else{
-                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:[]});
+                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: data.puntata+"fold",movimenti_non_permessi:["call"]});
                         }
                     }
                     else{
@@ -304,17 +323,27 @@ io.on("connection", (socket) => {
                         if(room.coperte===5){//invio le prime 3 carte
                             room.coperte=2
                             io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(0,3)});
-                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:[],});
+                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: data.puntata+"fold",movimenti_non_permessi:["call"]});
                         }
                         else if(room.coperte===2){//invio quarta carta
                             room.coperte=1
                             io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(3,4)});
-                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:[],});
+                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: data.puntata+"fold",movimenti_non_permessi:["call"]});
                         }
-                        else if(room.coperte===2){//invio ultima carta
+                        else if(room.coperte===1){//invio ultima carta
                             room.coperte=0
                             io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(4,5)});
-                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:[]});
+                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: data.puntata+"fold",movimenti_non_permessi:["call"]});
+                        }
+                        else if(room.coperte===0){
+                            const ragazzi_vincenti = []
+                            room.in_gioco.forEach((giocatore,index)=>{
+                                if(giocatore===true){
+                                    ragazzi_vincenti.push({nome:room.players[index],cards:room.cardsDistributed[room.players[index]]})
+                                }
+                            })
+                            const vincitore=Vincitore(room.carte_tavolo.cards,ragazzi_vincenti)
+                            io.to(data.roomId).emit("fine-partita", { vincitore: vincitore,carte_giocatori:room.cardsDistributed, piatto_finale:room.piatto});
                         }
                     }
                     console.log(room)
@@ -354,10 +383,10 @@ io.on("connection", (socket) => {
                         }
                         if(controllo_mancanti===true){
                             if(room.mancaturno[room.players.length-1]===false){ // questo controlla se è il secondo giro, se si non si può più fare ne raise ne all in
-                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "call",movimenti_non_permessi:["check","raise","all in"]});
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["check","raise","all in"]});
                             }
                             else{
-                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "call",movimenti_non_permessi:["check"]});
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["check"]});
                             }  
                         }
                         else{
@@ -368,18 +397,28 @@ io.on("connection", (socket) => {
                             if(room.coperte===5){//invio le prime 3 carte
                                 room.coperte=2
                                 io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(0,3)});
-                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "call",movimenti_non_permessi:[]});
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["call"]});
                             }
                             else if(room.coperte===2){//invio quarta carta
                                 room.coperte=1
                                 io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(3,4)});
-                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "call",movimenti_non_permessi:[]});
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["call"]});
                             }
-                            else if(room.coperte===2){//invio ultima carta
+                            else if(room.coperte===1){//invio ultima carta
                                 room.coperte=0
                                 io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(4,5)});
-                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "call",movimenti_non_permessi:[]});
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["call"]});
                             }
+                            else if(room.coperte===0){
+                            const ragazzi_vincenti = []
+                            room.in_gioco.forEach((giocatore,index)=>{
+                                if(giocatore===true){
+                                    ragazzi_vincenti.push({nome:room.players[index],cards:room.cardsDistributed[room.players[index]]})
+                                }
+                            })
+                            const vincitore=Vincitore(room.carte_tavolo.cards,ragazzi_vincenti)
+                            io.to(data.roomId).emit("fine-partita", { vincitore: vincitore,carte_giocatori:room.cardsDistributed, piatto_finale:room.piatto});
+                        }
                         }
                         console.log(room,"dopo call")
                     }// manca gestione all_in minore del ultima puntata
@@ -418,14 +457,43 @@ io.on("connection", (socket) => {
                             }
                         }
                         if(controllo_mancanti===true){
-                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:["call"]});
+                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["call"]});
+                        }
+                        else{
+                            console.log("inizio nuovo turno dentro call")
+                            for (let j = 0; j < room.players.length; j++) {//riattiva tutti i mancaturno perchè inizia un nuovo round
+                                room.mancaturno[j]=true
+                            }
+                            if(room.coperte===5){//invio le prime 3 carte
+                                room.coperte=2
+                                io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(0,3)});
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["call"]});
+                            }
+                            else if(room.coperte===2){//invio quarta carta
+                                room.coperte=1
+                                io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(3,4)});
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["call"]});
+                            }
+                            else if(room.coperte===1){//invio ultima carta
+                                room.coperte=0
+                                io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(4,5)});
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["call"]});
+                            }
+                            else if(room.coperte===0){
+                                const ragazzi_vincenti = []
+                                room.in_gioco.forEach((giocatore,index)=>{
+                                    if(giocatore===true){
+                                        ragazzi_vincenti.push({nome:room.players[index],cards:room.cardsDistributed[room.players[index]]})
+                                    }
+                                })
+                                const vincitore=Vincitore(room.carte_tavolo.cards,ragazzi_vincenti)
+                                io.to(data.roomId).emit("fine-partita", { vincitore: vincitore,carte_giocatori:room.cardsDistributed, piatto_finale:room.piatto});
+                        }
                         }
                         console.log(room)
                 }
 
-                room.piatto += data.puntata;
-
-                
+                room.piatto += parseInt(data.puntata);
 
             }
         }

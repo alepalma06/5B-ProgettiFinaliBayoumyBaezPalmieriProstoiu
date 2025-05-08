@@ -8,7 +8,7 @@ export const createPartita = (parentElement) => {
                 <div id="carte_mano"></div>
                 <div id="azioni_giocatore" class="action-buttons"></div>`;
         },
-        creaGiocatori:(nome,players, showCards = false)=> {
+        creaGiocatori:(players, showCards = false)=> {
             let html = '';
             players.forEach(player => {
                 html += `
