@@ -9,52 +9,12 @@ import { createGiocatore } from "/componenti/giocatore.js";
 import { generatePubSub } from "/componenti/pub_sub.js";
 import { createStanzaAttesa } from "/componenti/stanza_attesa.js";
 import { createStanze } from "/componenti/crea_stanza.js";
+import { createPartita } from "/componenti/partita.js";
+
 
 createNavigator(document.querySelector(".poker-table"));
 // Inizializza socket.io
 const socket = io();
-
-function creaGiocatori(nome,players, showCards = false) {
-    let html = '';
-    players.forEach(player => {
-        if(player.nome!=nome){
-        html += `
-            <div class="giocatore">
-                <div class="nome">${player.nome}</div>
-                <div class="${showCards ? 'carte' : 'puntata'}">
-                    ${
-                        showCards
-                            ? `<img src="${player.carte[0]}" alt="Carta 1">
-                               <img src="${player.carte[1]}" alt="Carta 2">`
-                            : `${player.puntata} `
-                    }
-                </div>
-                <div>💰</div>
-            </div>
-        `;}
-    });
-
-    document.getElementById('giocatori_container').innerHTML = html;
-}
-
-function aggiornaGiocatore(nomeGiocatore, nuovaPuntata, nomeGiocatoreDiTurno) {
-    const giocatori = document.querySelectorAll('.giocatore');
-    giocatori.forEach(giocatore => {
-        const nome = giocatore.querySelector('.nome')?.textContent.trim();
-
-        if (nome === nomeGiocatore) {
-            const puntataDiv = giocatore.querySelector('.puntata');
-            if (puntataDiv) {
-                puntataDiv.textContent = nuovaPuntata;
-            }
-        }
-        if (nome === nomeGiocatoreDiTurno) {
-            giocatore.style.boxShadow = '0 0 15px 5px yellow';
-        } else {
-            giocatore.style.boxShadow = 'none';
-        }
-    });
-}
 
 async function getConfiguration() {
     try {
@@ -80,6 +40,7 @@ async function initialize() {
         const Form_recupera = createFormRecupera(document.querySelector("#recupera-container"));
         const StanzaAttesa = createStanzaAttesa(document.querySelector("#stanza_attesa_container"));
         const Stanza = createStanze(document.querySelector("#stanze_container"));
+        const Partita = createPartita(document.querySelector("#partita"))
         const PubSub = generatePubSub();
 
         const scrollbar = ScrollBarComponent(document.querySelector("#turni"));
@@ -145,7 +106,7 @@ async function initialize() {
                 response.giocatori.forEach(player =>{
                     puntate_iniziali.push({nome:player,puntata:0})
                 })
-                creaGiocatori(nome,puntate_iniziali)
+                Partita.creaGiocatori(nome,puntate_iniziali)
                 if (response.primo == nome){
                     GiocatoreComponent.mio_turno(socket,0)
                 }
@@ -186,7 +147,7 @@ async function initialize() {
         socket.on("turno", (response) => {
             console.log("è il turno di: ",response.nome);
             const nome = sessionStorage.getItem("NAME");
-            aggiornaGiocatore(response.ultimo,response.ultima_puntata,response.nome)
+            Partita.aggiornaGiocatore(response.ultimo,response.ultima_puntata,response.nome)
             if (response.nome == nome) {
                 GiocatoreComponent.mio_turno(socket,response.ultima_puntata)
             }
