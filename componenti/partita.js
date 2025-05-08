@@ -11,7 +11,6 @@ export const createPartita = (parentElement) => {
         creaGiocatori:(nome,players, showCards = false)=> {
             let html = '';
             players.forEach(player => {
-                if(player.nome!=nome){
                 html += `
                     <div class="giocatore">
                         <div class="nome">${player.nome}</div>
@@ -25,7 +24,7 @@ export const createPartita = (parentElement) => {
                         </div>
                         <div>💰</div>
                     </div>
-                `;}
+                `;
             });
         
             document.getElementById('giocatori_container').innerHTML = html;

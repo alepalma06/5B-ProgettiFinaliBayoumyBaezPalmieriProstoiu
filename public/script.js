@@ -111,7 +111,9 @@ async function initialize() {
                     puntate_iniziali.push({nome:player,puntata:0})
                 })
                 Partita.creaGiocatori(nome,puntate_iniziali)
+                Partita.aggiornaGiocatore(nome, 0, nome)
                 if (response.primo == nome){
+                    GiocatoreComponent.movimenti_non_permessi(response.movimenti_non_permessi)
                     GiocatoreComponent.mio_turno(socket,0)
                 }
             } else {

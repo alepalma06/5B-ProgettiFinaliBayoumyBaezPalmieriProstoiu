@@ -30,26 +30,31 @@ export const createGiocatore = (parentElement) => {
             fichesElement.innerHTML = "Fiches: " + fich;
             fiches=fich
         },
+        movimenti_non_permessi: (movimenti) => {
+            const actions = document.querySelector("#azioni_giocatore");
+            movimenti.forEach(mov => {
+                console.log(mov)
+                let bottoni = actions.querySelectorAll(".action-button");
+                console.log(bottoni)
+                bottoni.forEach(bottone=>{
+                    console.log(bottone.innerText.toLowerCase())
+                    if(bottone.innerText.toLowerCase()===mov){
+                        bottone.disabled = true;
+                    }
+                    else{
+                        bottone.disabled = false;
+                    }
+                })
+            });
+        },
         mio_turno: (socket, ultima_puntata) => {
 
             const messaggio = document.getElementById("messaggio");
-            messaggio.innerHTML = "E' il tuo turno!";
             const foldButton = document.querySelector("#fold");
             const checkButton = document.querySelector("#check");
             const callButton = document.querySelector("#call");
             const raiseButton = document.querySelector("#raise");
             const allinButton = document.querySelector("#allin");
-
-            if (ultima_puntata === 0) {
-                checkButton.disabled = false;
-            } else {
-                checkButton.disabled = true;
-            }
-
-            foldButton.disabled = false;
-            callButton.disabled = false;
-            raiseButton.disabled = false;
-            allinButton.disabled = false;
 
             foldButton.onclick = () => {
                 foldButton.disabled = true;
