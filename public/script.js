@@ -34,13 +34,17 @@ async function initialize() {
         // Inizializza i componenti
         const Login = createLogin();
         const Register = createRegister();
+        const Partita = createPartita(document.querySelector("#partita"))
+
+        //render partita tocca farlo prima di giocatore perchè usa div che crea partita
+        Partita.render();
+
         const GiocatoreComponent = createGiocatore(document.querySelector("#azioni_giocatore"));
         const Form_register = createFormRegister(document.querySelector("#register-container"));
         const Form_Login = createFormLogin(document.querySelector("#login-container"));
         const Form_recupera = createFormRecupera(document.querySelector("#recupera-container"));
         const StanzaAttesa = createStanzaAttesa(document.querySelector("#stanza_attesa_container"));
         const Stanza = createStanze(document.querySelector("#stanze_container"));
-        const Partita = createPartita(document.querySelector("#partita"))
         const PubSub = generatePubSub();
 
         const scrollbar = ScrollBarComponent(document.querySelector("#turni"));
@@ -54,14 +58,14 @@ async function initialize() {
         //render recupera password
         Form_recupera.render(Register);
 
-        //render giocatore
-        GiocatoreComponent.render();
-
         //render stanza attesa
         StanzaAttesa.render();
 
         //render stanze
         Stanza.render(socket);
+
+        //render giocatore
+        GiocatoreComponent.render();
 
         
         socket.on("connect", () => {
