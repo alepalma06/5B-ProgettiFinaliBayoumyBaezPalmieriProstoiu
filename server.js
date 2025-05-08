@@ -151,6 +151,7 @@ io.on("connection", (socket) => {
                 piatto: 0,
                 avviata: false,
                 partite_giocate: 0,
+                coperte: [true,true,true],
             };
             socket.join(data.roomId); 
             console.log(rooms)
