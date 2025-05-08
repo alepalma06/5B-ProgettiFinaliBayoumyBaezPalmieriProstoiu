@@ -16,9 +16,12 @@ app.use(express.json());
 database.createTable();
 
 async function vincitore(tavolo,players) {
-    players.forEach(player=>{
-        
+    const giocatori_in_finale = []
+    players.forEach((player,index)=>{
+        giocatori_in_finale[index]= Hand.solve([player.cards[0],player.cards[1], ...tavolo]);
     })
+    const winners = Hand.winners(giocatori_in_finale);
+    console.log(winners)
 }
 
 async function getConfiguration() {
