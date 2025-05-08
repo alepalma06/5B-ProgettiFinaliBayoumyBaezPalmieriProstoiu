@@ -206,6 +206,7 @@ body, html {
 #carte_house {
     display: flex;
     justify-content: center;
+    margin-left: 130px;
     margin-top: 65px;
     width: 550px;
     background-color: #006400; 
@@ -328,15 +329,14 @@ body, html {
 }
 
 #giocatori_container .giocatore {
-    width: 80px;
+    width: 100px;
     background-color: #222;
     color: white;
     border-radius: 10px;
     padding: 8px;
-    padding-left: 30px;
-    padding-right: 30px;
+    margin-left: 30px;
+    margin-right: 30px;
     font-size: 0.9rem;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
     text-align: center;
 }
 
@@ -349,11 +349,15 @@ body, html {
 
 #giocatori_container .giocatore .puntata {
     margin-top: 5px;
+    width: 30px;
+    height: 30px;
     display: inline-block;
+    text-align: center;
+    line-height: 30px;
     background-color: gold;
     color: black;
     font-weight: bold;
-    padding: 3px 6px;
+    padding: 3px 3px;
     border-radius: 8px;
     font-size: 0.8rem;
 }

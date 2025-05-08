@@ -4,7 +4,7 @@ export const createPartita = (parentElement) => {
         render: () => {
             parentElement.innerHTML =
                 `<div id="giocatori_container" class="d-flex justify-content-center flex-wrap mb-3"></div>
-                <div id="carte_house"></div>
+                <div id="carte_house""></div>
                 <div id="carte_mano"></div>
                 <div id="azioni_giocatore" class="action-buttons"></div>`;
         },
