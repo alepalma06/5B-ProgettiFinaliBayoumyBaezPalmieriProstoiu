@@ -6,6 +6,7 @@ const axios = require('axios');
 const nodemailer = require("nodemailer");
 const fs = require('fs').promises;
 const { Hand } = require('pokersolver');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const server = http.createServer(app);
@@ -53,13 +54,20 @@ app.post("/insert", async (req, res) => {//per fare insert
     poker.fiches = 500
     poker.password=await generapassword()
     try {
-        await database.insert(poker);
         inviaEmail(poker)
+        console.log(poker)
+        console.log("spazio")
+        console.log(poker.password)
+        const password_hash = await bcrypt.hash(poker.password, 10);
+        poker.password = password_hash;
+        console.log(password_hash)
+        await database.insert(poker);
         res.json({result: "ok"});
     } catch (e) {
         res.status(500).json({result: "ko"});
     }
   })
+
 
   app.post("/delete", async (req, res) => {//per fare remove
     const poker = req.body;
@@ -81,17 +89,20 @@ app.post("/login", async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        // Controlla se il nome utente esiste nel database
-        const result = await database.select();
-        const user = result.find((u) => u.username === username);
+        const result = await database.select(); // seleziona tutti gli utenti
+        const user = result.find(u => u.username === username); // trova l'utente con quello username
 
-        if (user && user.password === password) {
-            // Se il nome utente e la password sono corretti
-            res.json({ success: true });
+        if (user) {
+            const match = await bcrypt.compare(password, user.password); // confronto con bcrypt
+            if (match) {
+                res.json({ success: true }); // login ok
+            } else {
+                res.json({ success: false, message: "Password errata." }); // password sbagliata
+            }
         } else {
-            // Se le credenziali non corrispondono
-            res.json({ success: false, message: "Credenziali errate." });
+            res.json({ success: false, message: "Utente non trovato." }); // username non trovato
         }
+
     } catch (error) {
         console.error("Errore nel login:", error);
         res.status(500).json({ success: false, message: "Errore interno del server." });
