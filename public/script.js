@@ -11,6 +11,8 @@ import { createStanzaAttesa } from "/componenti/stanza_attesa.js";
 import { createStanze } from "/componenti/crea_stanza.js";
 
 createNavigator(document.querySelector(".poker-table"));
+// Inizializza socket.io
+const socket = io();
 
 function creaGiocatori(nome,players, showCards = false) {
     let html = '';
@@ -65,8 +67,6 @@ async function getConfiguration() {
 
 async function initialize() {
     try {
-        // Inizializza socket.io
-        const socket = io();
 
         // Carica configurazione
         const conf = await getConfiguration();
