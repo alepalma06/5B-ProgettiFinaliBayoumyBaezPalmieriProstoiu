@@ -34,7 +34,7 @@ body, html {
     width: 80px;
 }
 
-#login-container {
+.login-container {
     background: linear-gradient(145deg, #0f3d24, #092117); /* Effetto 3D verde */
     border-radius: 10px;
     padding: 20px 30px;
@@ -43,14 +43,14 @@ body, html {
     width: 350px;
 }
 
-#login-container h1 {
+.login-container h1 {
     font-size: 28px;
     margin-bottom: 20px;
     font-weight: bold;
     color: #e3b041; /* Oro */
 }
 
-#login-container input {
+.login-container input {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
@@ -61,11 +61,11 @@ body, html {
     font-size: 16px;
 }
 
-#login-container input::placeholder {
+.login-container input::placeholder {
     color: #99bfa6; /* Verde chiaro tenue */
 }
 
-#login-container input:focus {
+.login-container input:focus {
     outline: none;
     border-color: #e3b041; /* Oro */
 }

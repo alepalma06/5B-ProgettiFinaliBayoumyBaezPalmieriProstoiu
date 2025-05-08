@@ -1,4 +1,5 @@
 export const createGiocatore = (parentElement) => {
+    let fiches=0;
     return { 
         render: () => {
             parentElement.innerHTML =
@@ -9,12 +10,14 @@ export const createGiocatore = (parentElement) => {
                 `<input type="number" class="form-control form-control-sm d-inline-block w-auto ms-2" placeholder="2" id="puntata_libera"></input>` +
                 `<button class="btn btn-info action-button" id="allin">All In</button>` +
                 `<p id="fiches">Fiches</p>` +
-                `<p id="messaggio">messaggio</p>`;
+                `<p id="messaggio"></p>`;
             const foldButton = document.querySelector("#fold");
             const checkButton = document.querySelector("#check");
             const callButton = document.querySelector("#call");
             const raiseButton = document.querySelector("#raise");
             const allinButton = document.querySelector("#allin");
+            const fichesElement = document.querySelector("#fiches");
+            fichesElement.innerHTML = "Fiches: " + fiches;
             
             foldButton.disabled = true;
             checkButton.disabled = true;
@@ -22,7 +25,15 @@ export const createGiocatore = (parentElement) => {
             raiseButton.disabled = true;
             allinButton.disabled = true;
         },
+        aggiorna_fiches: (fich) => {
+            const fichesElement = document.querySelector("#fiches");
+            fichesElement.innerHTML = "Fiches: " + fich;
+            fiches=fich
+        },
         mio_turno: (socket, ultima_puntata) => {
+
+            const messaggio = document.getElementById("messaggio");
+            messaggio.innerHTML = "E' il tuo turno!";
             const foldButton = document.querySelector("#fold");
             const checkButton = document.querySelector("#check");
             const callButton = document.querySelector("#call");
@@ -48,6 +59,7 @@ export const createGiocatore = (parentElement) => {
                 allinButton.disabled = true;
                 socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "fold" , puntata: 0 });
                 console.log("Fold eseguito");
+                messaggio.innerHTML = "";
             };
 
             checkButton.onclick = () => {
@@ -58,6 +70,7 @@ export const createGiocatore = (parentElement) => {
                 allinButton.disabled = true;
                 socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "check" , puntata: 0 });
                 console.log("Check eseguito");
+                messaggio.innerHTML = "";
             };
 
             callButton.onclick = () => {
@@ -78,8 +91,11 @@ export const createGiocatore = (parentElement) => {
                         puntataLibera = ultima_puntata;
                     }
                 }
+                fiches-=puntataLibera
+                document.querySelector("#fiches").innerHTML = "Fiches: " + fiches;
                 socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "call" , puntata: puntataLibera });
                 console.log("Call eseguito");
+                messaggio.innerHTML = "";
             };
 
             raiseButton.onclick = () => {
@@ -100,8 +116,11 @@ export const createGiocatore = (parentElement) => {
                         puntataLibera = ultima_puntata*2;
                     }
                 }
+                fiches-=puntataLibera
+                document.querySelector("#fiches").innerHTML = "Fiches: " + fiches;
                 socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "raise" , puntata: puntataLibera });
                 console.log("Raise eseguito");
+                messaggio.innerHTML = "";
             };
 
             allinButton.onclick = () => {
@@ -110,9 +129,12 @@ export const createGiocatore = (parentElement) => {
                 callButton.disabled = true;
                 raiseButton.disabled = true;
                 allinButton.disabled = true;
-                let puntataLibera = 2;
+                let puntataLibera = fiches;
+                fiches -= puntataLibera;
+                document.querySelector("#fiches").innerHTML = "Fiches: " + fiches;
                 socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "allin" , puntata: puntataLibera });
                 console.log("All In eseguito");
+                messaggio.innerHTML = "";
             };
         },
     };

@@ -18,7 +18,7 @@ database.createTable();
 async function vincitore(tavolo,players) {
     const giocatori_in_finale = []
     players.forEach((player,index)=>{
-        giocatori_in_finale[index]= Hand.solve([player.cards[0],player.cards[1], ...tavolo]);
+        giocatori_in_finale[index]= Hand.solve([player.cards[0],player.cards[1],tavolo]);
     })
     const winners = Hand.winners(giocatori_in_finale);
     console.log(winners)
@@ -155,6 +155,7 @@ io.on("connection", (socket) => {
                 avviata: false,
                 partite_giocate: 0,
                 coperte: [true,true,true],
+                fiches: [],
             };
             socket.join(data.roomId); 
             console.log(rooms)
@@ -169,10 +170,11 @@ io.on("connection", (socket) => {
             rooms[data.roomId].players.push(data.nome);
             rooms[data.roomId].in_gioco.push(true);
             rooms[data.roomId].giocata.push("none");
+            rooms[data.roomId].fiches.push(500);
             playerConnections[data.nome] = socket;
             socket.join(data.roomId);
             console.log(`${data.nome} si è unito alla stanza ${data.roomId}`, rooms);
-            io.to(data.roomId).emit('room-joined', { roomId: data.roomId, nameRoom:rooms[data.roomId].nameRoom, players: rooms[data.roomId].players, success: true });
+            io.to(data.roomId).emit('room-joined', { roomId: data.roomId, nameRoom:rooms[data.roomId].nameRoom, players: rooms[data.roomId].players, fiches: rooms[data.roomId].fiches, success: true });
         } else {
             socket.emit('room-joined-error');
             console.log(`${data.nome} ha tentato di unirsi alla stanza ${data.roomId} ma la partita è già iniziata`);

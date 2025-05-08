@@ -3,11 +3,15 @@ export const createFormRegister = (parentElement) => {
         render:(register) =>  {
 
             parentElement.innerHTML = 
-                `<input id="nomer" type="text" placeholder="Username" required>`+
-                `<input id="email" type="email" placeholder="Email" required>`+
-                `<button type="button" id="buttonregister" class="bottoni_principali">Registrati</button>`+
-                `<p>Hai un account? <a href="#home">Accedi</a></p>`+
-                `<p id="outputformreg"></p>`;
+                `<div class="card-icon">♠ ♥ ♣ ♦</div>`+
+                `<h1>Registrati</h1>`+
+                `<form id="formregister">
+                    <input id="nomer" type="text" placeholder="Username" required>
+                    <input id="email" type="email" placeholder="Email" required>
+                    <button type="button" id="buttonregister" class="bottoni_principali">Registrati</button>
+                    <p>Hai un account? <a href="#home">Accedi</a></p>
+                    <p id="outputformreg"></p>
+                </form>`
 
             document.querySelector("#buttonregister").onclick = async() => {
                 const Nome = document.querySelector("#nomer").value;

@@ -75,9 +75,9 @@ async function initialize() {
         const Login = createLogin();
         const Register = createRegister();
         const GiocatoreComponent = createGiocatore(document.querySelector("#azioni_giocatore"));
-        const Form_register = createFormRegister(document.querySelector("#formregister"));
-        const Form_Login = createFormLogin(document.querySelector("#formlogin"));
-        const Form_recupera = createFormRecupera(document.querySelector("#formrecupera"));
+        const Form_register = createFormRegister(document.querySelector("#register-container"));
+        const Form_Login = createFormLogin(document.querySelector("#login-container"));
+        const Form_recupera = createFormRecupera(document.querySelector("#recupera-container"));
         const StanzaAttesa = createStanzaAttesa(document.querySelector("#stanza_attesa_container"));
         const Stanza = createStanze(document.querySelector("#stanze_container"));
         const PubSub = generatePubSub();
@@ -119,6 +119,12 @@ async function initialize() {
         // Ascolta "room-joined"
         socket.on("room-joined", (response) => {
             StanzaAttesa.entra_in_stanza(response,socket);
+            for (let i = 0; i < response.players.length; i++) {
+                if (response.players[i] === sessionStorage.getItem("NAME")) {
+                    GiocatoreComponent.aggiorna_fiches(response.fiches[i]);
+                    break;
+                }
+            }
             window.location.href = "#stanza_attesa";
         });
         

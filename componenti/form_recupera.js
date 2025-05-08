@@ -3,11 +3,15 @@ export const createFormRecupera = (parentElement) => {
         render:(recupera) =>  {
 
             parentElement.innerHTML = 
-                `<input id="nomerec" type="text" placeholder="Username" required>`+
-                `<input id="emailrec" type="email" placeholder="Email" required>`+
-                `<button type="button" id="buttonrecupera" class="bottoni_principali">Recupera Password</button>`+
-                `<p>Hai un account? <a href="#home">Accedi</a></p>`+
-                `<p id="outputformrecupera"></p>`;
+                `<div class="card-icon">♠ ♥ ♣ ♦</div>`+
+                `<h1>Recupera password</h1>`+
+                `<form id="formrecupera">
+                    <input id="nomerec" type="text" placeholder="Username" required>
+                    <input id="emailrec" type="email" placeholder="Email" required>
+                    <button type="button" id="buttonrecupera" class="bottoni_principali">Recupera Password</button>
+                    <p>Hai un account? <a href="#home">Accedi</a></p>
+                    <p id="outputformrecupera"></p>
+                </form>`
 
             document.querySelector("#buttonrecupera").onclick = async() => {
                 const Nome = document.querySelector("#nomerec").value;
