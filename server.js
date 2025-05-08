@@ -161,11 +161,13 @@ io.on("connection", (socket) => {
                 conferma_pescata: [],
                 giocata: [],
                 in_gioco: [],
+                mancaturno:[],
                 ultima_puntata: 0,
                 piatto: 0,
                 avviata: false,
                 partite_giocate: 0,
-                coperte: [true,true,true],
+                coperte: 5,
+                carte_tavolo:[],
                 fiches: [],
             };
             socket.join(data.roomId); 
@@ -180,6 +182,7 @@ io.on("connection", (socket) => {
         if (rooms[data.roomId] && rooms[data.roomId].avviata === false) {
             rooms[data.roomId].players.push(data.nome);
             rooms[data.roomId].in_gioco.push(true);
+            rooms[data.roomId].mancaturno.push(true);
             rooms[data.roomId].giocata.push("none");
             rooms[data.roomId].fiches.push(500);
             playerConnections[data.nome] = socket;
@@ -226,6 +229,7 @@ io.on("connection", (socket) => {
         const room = rooms[data.roomId];
         if (room) {
             const cardsDataTavolo = await drawCards(room.deckId, 5);
+            room.carte_tavolo=cardsDataTavolo
             const cardsData = await drawCards(room.deckId, room.players.length * 2);
             if (cardsData && cardsData.cards) {
                 let index = 0;
@@ -237,7 +241,6 @@ io.on("connection", (socket) => {
                         playerSocket.emit('cards-distributed', {
                             roomId: data.roomId,
                             cards_player: room.cardsDistributed[player],
-                            cards_house: cardsDataTavolo.cards,
                             turno: 0,
                         });
                     }
@@ -250,31 +253,179 @@ io.on("connection", (socket) => {
 
     socket.on("giocata", (data) => {
         const room = rooms[data.roomId];
-        console.log(room)
+        console.log(room,data)
         for (let i = 0; i < room.players.length; i++) {
             if (room.players[i] === data.nome) {
+                let prossimo_giocatore = (i + 1) % room.players.length;// decide il prossimo giocatore
+                while (room.in_gioco[prossimo_giocatore] === false) {
+                    prossimo_giocatore = (prossimo_giocatore + 1) % room.players.length; // verifica che il prossimo giocatore non abbia abbandonato se no passa al succesivo
+                }
                 if (data.giocata === "fold") {
                     room.giocata[i] = data.giocata;
                     room.in_gioco[i] = false;
-                } else if (data.giocata === "allin") {
+                    room.mancaturno[i] = false;
+
+                    //trova l'ultima mossa non fold
+                    let ultimaGiocata;
+                    const numGiocatori = room.players.length;
+                    let j = i;
+
+                    for (let k = 1; k < numGiocatori; k++) {
+                        j = (j - 1 + numGiocatori) % numGiocatori; // scorrimento circolare indietro
+                        let giocata = room.giocata[j];
+                        if (giocata && giocata !== "fold") {
+                            ultimaGiocata = giocata;
+                            break;
+                        }
+                    }
+
+                    let controllo_mancanti = false;
+                    for (let j = 0; j < room.players.length; j++) {// questo controlla se mancanano giocatori che devono fare il turno, se non mancano avvia il turno successivo
+                        if (room.mancaturno[j]===true){
+                            controllo_mancanti = true;
+                        }
+                    }
+                    if(controllo_mancanti===true){
+                        if (ultimaGiocata!="check"){
+                            if(room.mancaturno[room.player.length-1]===false){ // questo controlla se è il secondo giro, se si non si può più fare ne raise ne all in
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:["check","raise","all in"]});
+                            }
+                            else{
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:["check"]});
+                            }  
+                        }else{
+                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:[]});
+                        }
+                    }
+                    else{
+                        for (let j = 0; j < room.players.length; j++) {//riattiva tutti i mancaturno perchè inizia un nuovo round
+                            room.mancaturno[j]=true
+                        }
+                        if(room.coperte===5){//invio le prime 3 carte
+                            room.coperte=2
+                            io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(0,3)});
+                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:[],});
+                        }
+                        else if(room.coperte===2){//invio quarta carta
+                            room.coperte=1
+                            io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(3,4)});
+                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:[],});
+                        }
+                        else if(room.coperte===2){//invio ultima carta
+                            room.coperte=0
+                            io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(4,5)});
+                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:[]});
+                        }
+                    }
+                    console.log(room)
+                } 
+                else if (data.giocata === "allin") {
                     room.giocata[i] = data.giocata;
                     room.in_gioco[i] = false;
+                    room.mancaturno[i] = false;
                     if ( data.puntata >= room.ultima_puntata) {
                         room.ultima_puntata = data.puntata;
+                    }// manca gestione all_in minore del ultima puntata
+                    for (let j = 0; j < room.players.length; j++) {// riattiva gli altri giocatori
+                        if(room.in_gioco[j]===true && i != j){
+                            room.mancaturno[j] = true;
+                        }
                     }
-                } else {
-                    if (data.puntata > room.ultima_puntata) {
+                    if(i != room.players.length-1){
+                        io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["check"]});
+                    }
+                    else{
+                        io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["check","raise","all in"]});
+                    }
+                    console.log(room)
+                } 
+                else if (data.giocata === "call"){
+                    if (data.puntata >= room.ultima_puntata) {
+                        console.log("ciaoioiioi")
                         room.ultima_puntata = data.puntata;
-                        room.giocata[i] = data.puntata;
-                    }
-                }
-                room.piatto += data.puntata;
-                let prossimo_giocatore = (i + 1) % room.players.length;
-                while (room.in_gioco[prossimo_giocatore] === false) {
-                    prossimo_giocatore = (prossimo_giocatore + 1) % room.players.length;
+                        room.giocata[i] = data.giocata;
+                        room.mancaturno[i] = false;
+                        console.log(room,"prima di call")
+                        let controllo_mancanti = false;
+                        for (let j = 0; j < room.players.length; j++) {// questo controlla se mancanano giocatori che devono fare il turno, se non mancano avvia il turno successivo
+                            if (room.mancaturno[j]===true){
+                                controllo_mancanti = true;
+                            }
+                        }
+                        if(controllo_mancanti===true){
+                            if(room.mancaturno[room.players.length-1]===false){ // questo controlla se è il secondo giro, se si non si può più fare ne raise ne all in
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "call",movimenti_non_permessi:["check","raise","all in"]});
+                            }
+                            else{
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "call",movimenti_non_permessi:["check"]});
+                            }  
+                        }
+                        else{
+                            console.log("inizio nuovo turno dentro call")
+                            for (let j = 0; j < room.players.length; j++) {//riattiva tutti i mancaturno perchè inizia un nuovo round
+                                room.mancaturno[j]=true
+                            }
+                            if(room.coperte===5){//invio le prime 3 carte
+                                room.coperte=2
+                                io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(0,3)});
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "call",movimenti_non_permessi:[]});
+                            }
+                            else if(room.coperte===2){//invio quarta carta
+                                room.coperte=1
+                                io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(3,4)});
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "call",movimenti_non_permessi:[]});
+                            }
+                            else if(room.coperte===2){//invio ultima carta
+                                room.coperte=0
+                                io.to(data.roomId).emit("nuovecartetavolo", {carte:room.carte_tavolo.cards.slice(4,5)});
+                                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "call",movimenti_non_permessi:[]});
+                            }
+                        }
+                        console.log(room,"dopo call")
+                    }// manca gestione all_in minore del ultima puntata
+    
                 }
 
-                io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata });
+
+                else if (data.giocata === "raise"){
+                    if (data.puntata > room.ultima_puntata) {
+                        room.ultima_puntata = data.puntata;
+                        room.giocata[i] = data.giocata;
+                        room.mancaturno[i] = false;
+                        for (let j = 0; j < room.players.length; j++) {// riattiva gli altri giocatori
+                            if(room.in_gioco[j]===true && i != j){
+                                room.mancaturno[j] = true;
+                            }
+                        }
+                        if(room.mancaturno[room.players.length-1]===false){ // questo controlla se è il secondo giro, se si non si può più fare ne raise ne all in
+                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["check","raise","all in"]});
+                        }
+                        else{
+                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["check"]});
+                        }  
+                    }// manca gestione all_in minore del ultima puntata
+                    console.log(room)
+                }
+
+                else if (data.giocata === "check"){
+                        room.ultima_puntata = data.puntata;
+                        room.giocata[i] = data.giocata;
+                        room.mancaturno[i] = false;
+                        let controllo_mancanti
+                        for (let j = 0; j < room.players.length; j++) {// questo controlla se mancanano giocatori che devono fare il turno, se non mancano avvia il turno successivo
+                            if (room.mancaturno[j]===true){
+                                controllo_mancanti = true;
+                            }
+                        }
+                        if(controllo_mancanti===true){
+                            io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: "fold",movimenti_non_permessi:["call"]});
+                        }
+                        console.log(room)
+                }
+
+                room.piatto += data.puntata;
+
+                
 
             }
         }

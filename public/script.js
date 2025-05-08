@@ -126,9 +126,9 @@ async function initialize() {
             const carte_house = document.querySelector("#carte_house");
             const carte_mano = document.querySelector("#carte_mano");
             let template = "";
-            response.cards_house.forEach(carta_house => {
-                template += `<img src="../assets/images/back-card.png"></img>`;
-            });
+            for(let i = 0; i<5; i++) {
+                template += `<img class="cartecoperte" src="../assets/images/back-card.png"></img>`;
+            };
             carte_house.innerHTML = template;
             template = "";
             response.cards_player.forEach(carta_mano => {
@@ -151,12 +151,26 @@ async function initialize() {
         });
         
         socket.on("turno", (response) => {
+            console.log(response)
             console.log("è il turno di: ",response.nome);
             const nome = sessionStorage.getItem("NAME");
             Partita.aggiornaGiocatore(response.ultimo,response.ultima_puntata,response.nome)
             if (response.nome == nome) {
+                GiocatoreComponent.movimenti_non_permessi(response.movimenti_non_permessi)
                 GiocatoreComponent.mio_turno(socket,response.ultima_puntata)
             }
+        });
+
+        socket.on("nuovecartetavolo", (response) => {
+            const tavolo = document.querySelector("#carte_house");
+            response.carte.forEach((carta, index) => {
+                const carta_tavolo = tavolo.querySelectorAll(".cartecoperte")[index];
+                if (carta_tavolo) {
+                    carta_tavolo.className = "cartescoperte"; // cambia la classe
+                    console.log(carta)
+                    carta_tavolo.src = carta.image; // imposta il nuovo src (assicurati che carta.img sia corretto)
+                }
+            });
         });
         
         socket.on("disconnect", () => {
