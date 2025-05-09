@@ -28,8 +28,8 @@ export const createGiocatore = (parentElement) => {
         },
         aggiorna_fiches: (fich) => {
             const fichesElement = document.querySelector("#fiches");
-            fichesElement.innerHTML = "Fiches: " + fich;
-            fiches=fich
+            fiches+=fich
+            fichesElement.innerHTML = "Fiches: " + fiches;            
         },
         movimenti_non_permessi: (movimenti) => {
             const actions = document.querySelector("#azioni_giocatore");

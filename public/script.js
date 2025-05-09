@@ -183,6 +183,7 @@ async function initialize() {
         
         socket.on("fine-partita", (response) => {
             console.log(response);
+            let name = sessionStorage.getItem("NAME")
             let players = Object.entries(response.carte_giocatori).map(([nome, carte]) => {
             return {
                 nome,
@@ -190,6 +191,20 @@ async function initialize() {
             };
             });
             Partita.creaGiocatori(players,true)
+            const div_vincitore=document.querySelector("#vincitore")
+            let text = "";
+            response.vincitore.forEach(v=>{
+                if(text===""){
+                    text+=v.nome
+                }
+                else{
+                    text+=" pareggio con "+v.nome
+                }
+            })
+            div_vincitore.innerText="Vincitore: "+text
+            if(name===vincitore){
+                GiocatoreComponent.aggiorna_fiches(response.piatto_finale)
+            }
         });
 
         socket.on("disconnect", () => {

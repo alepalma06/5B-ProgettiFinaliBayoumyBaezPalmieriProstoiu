@@ -5,7 +5,7 @@ const path = require('path');
 const axios = require('axios');
 const nodemailer = require("nodemailer");
 const fs = require('fs').promises;
-const { Hand } = require('pokersolver');
+const PokerEvaluator = require('poker-evaluator');
 const bcrypt = require('bcrypt');
 
 const app = express();
@@ -16,32 +16,36 @@ const database = require("./database");
 app.use(express.json());
 database.createTable();
 
-async function Vincitore(tavolo,players) {
-    const giocatori_in_finale = []
-    const tav = tavolo.map(t => {
-        return t.code.replace("0", "T").toLowerCase();
-    });
-    console.log(tav)
-    players.forEach((player,index)=>{
-        giocatori_in_finale[index] = Hand.solve([
-        player.cards[0].code.replace("0", "T").toLowerCase(),
-        player.cards[1].code.replace("0", "T").toLowerCase(),
-        ...tav]);
-    })
-    const winners = Hand.winners(giocatori_in_finale);
-    console.log(winners)
-    // Trova i nomi dei vincitori
-    const vincitori_con_nome = winners.map(w => {
-        const index = giocatori_in_finale.indexOf(w);
-        return {
-            nome: players[index].nome,
-            descrizione: w.descr,
-            carte: w.cards.map(c => c.value + c.suit) 
-        };
+async function Vincitore(tavolo, players) {
+
+    // Converti le carte del tavolo nel formato corretto
+    const tav = tavolo.map(t => t.code.replace("0", "T").toLowerCase());
+    console.log("Tavolo:", tav);
+    const valutazioni = [];
+    // Costruisci le mani dei giocatori
+    players.forEach((player, index) => {
+        const mano = [
+            player.cards[0].code.replace('0', 'T').toLowerCase(),
+            player.cards[1].code.replace('0', 'T').toLowerCase(),
+            ...tav
+        ];
+        const result = PokerEvaluator.evalHand(mano);
+        console.log(`Giocatore ${player.nome}:`, result.handName, result);
+        valutazioni.push({
+            nome: player.nome,
+            valore: result.value,
+            descrizione: result.handName,
+            result:result,
+            carte: mano
+        });
     });
 
-    console.log(vincitori_con_nome);
-    return vincitori_con_nome;
+    // Trova il valore massimo tra tutti i giocatori
+    const maxValore = Math.max(...valutazioni.map(v => v.valore));
+    const vincitori = valutazioni.filter(v => v.valore === maxValore);
+
+    console.log("Vincitori:", vincitori);
+    return vincitori;
 }
 
 async function getConfiguration() {
@@ -270,7 +274,7 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("giocata", (data) => {
+    socket.on("giocata", async (data) => {
         const room = rooms[data.roomId];
         console.log(room,data)
         for (let i = 0; i < room.players.length; i++) {
@@ -346,7 +350,6 @@ io.on("connection", (socket) => {
                             io.to(data.roomId).emit("fine-partita", { vincitore: vincitore,carte_giocatori:room.cardsDistributed, piatto_finale:room.piatto});
                         }
                     }
-                    console.log(room)
                 } 
                 else if (data.giocata === "allin") {
                     room.giocata[i] = data.giocata;
@@ -366,15 +369,12 @@ io.on("connection", (socket) => {
                     else{
                         io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["check","raise","all in"]});
                     }
-                    console.log(room)
                 } 
                 else if (data.giocata === "call"){
                     if (data.puntata >= room.ultima_puntata) {
-                        console.log("ciaoioiioi")
                         room.ultima_puntata = data.puntata;
                         room.giocata[i] = data.giocata;
                         room.mancaturno[i] = false;
-                        console.log(room,"prima di call")
                         let controllo_mancanti = false;
                         for (let j = 0; j < room.players.length; j++) {// questo controlla se mancanano giocatori che devono fare il turno, se non mancano avvia il turno successivo
                             if (room.mancaturno[j]===true){
@@ -390,7 +390,6 @@ io.on("connection", (socket) => {
                             }  
                         }
                         else{
-                            console.log("inizio nuovo turno dentro call")
                             for (let j = 0; j < room.players.length; j++) {//riattiva tutti i mancaturno perchè inizia un nuovo round
                                 room.mancaturno[j]=true
                             }
@@ -420,7 +419,6 @@ io.on("connection", (socket) => {
                             io.to(data.roomId).emit("fine-partita", { vincitore: vincitore,carte_giocatori:room.cardsDistributed, piatto_finale:room.piatto});
                         }
                         }
-                        console.log(room,"dopo call")
                     }// manca gestione all_in minore del ultima puntata
     
                 }
@@ -443,7 +441,6 @@ io.on("connection", (socket) => {
                             io.to(data.roomId).emit("turno", { nome: room.players[prossimo_giocatore],ultimo:data.nome, ultima_puntata: room.ultima_puntata,movimenti_non_permessi:["check"]});
                         }  
                     }// manca gestione all_in minore del ultima puntata
-                    console.log(room)
                 }
 
                 else if (data.giocata === "check"){
@@ -486,11 +483,11 @@ io.on("connection", (socket) => {
                                         ragazzi_vincenti.push({nome:room.players[index],cards:room.cardsDistributed[room.players[index]]})
                                     }
                                 })
-                                const vincitore=Vincitore(room.carte_tavolo.cards,ragazzi_vincenti)
+                                const vincitore=await Vincitore(room.carte_tavolo.cards,ragazzi_vincenti)
+                                console.log("vincitore dentro partita: ",vincitore)
                                 io.to(data.roomId).emit("fine-partita", { vincitore: vincitore,carte_giocatori:room.cardsDistributed, piatto_finale:room.piatto});
                         }
                         }
-                        console.log(room)
                 }
 
                 room.piatto += parseInt(data.puntata);
