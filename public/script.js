@@ -90,7 +90,6 @@ async function initialize() {
                     break;
                 }
             }
-            window.location.href = "#stanza_attesa";
         });
         
         socket.on("room-joined-error", () => {
@@ -185,7 +184,17 @@ async function initialize() {
             };
             });
             Partita.creaGiocatori(players,true)
-            const div_vincitore=document.querySelector("#vincitore")
+            const finePartita = document.querySelector('.fine-partita');
+            if (finePartita) {
+                finePartita.classList.remove('hidden');
+                finePartita.classList.add('visible');
+                finePartita.style.display="flex"
+            } else {
+                console.error("Elemento #fine-partita non trovato nel DOM.");
+            }
+            const div_vincitore=document.querySelector(".titolo-fine")
+            const div_mano=document.querySelector(".mano-vincente")
+            console.log(div_mano,div_vincitore)
             let text = "";
             response.vincitore.forEach(v=>{
                 if(text===""){
@@ -196,8 +205,30 @@ async function initialize() {
                 }
             })
             div_vincitore.innerText="Vincitore: "+text
+            div_mano.innerText="Vinto con: "+response.vincitore[0].descrizione
+            const riinizia = document.querySelector("#torna_attesa")
+            const roomId = sessionStorage.getItem("currentRoom")
+            riinizia.onclick=()=>{
+                socket.emit("nuova_partita", {roomId});
+            }
             if(name===vincitore){
                 GiocatoreComponent.aggiorna_fiches(response.piatto_finale)
+            }
+        });
+
+        socket.on("rinizio-partita", (response) => {
+            const finePartita = document.querySelector('.fine-partita');
+            if (finePartita) {
+                finePartita.classList.add('hidden');
+                finePartita.classList.remove('visible');
+                finePartita.style.display="none"
+            }
+            StanzaAttesa.entra_in_stanza(response,socket);
+            for (let i = 0; i < response.players.length; i++) {
+                if (response.players[i] === sessionStorage.getItem("NAME")) {
+                    GiocatoreComponent.aggiorna_fiches(response.fiches[i]);
+                    break;
+                }
             }
         });
 
