@@ -20,7 +20,6 @@ async function Vincitore(tavolo, players) {
 
     // Converti le carte del tavolo nel formato corretto
     const tav = tavolo.map(t => t.code.replace("0", "T").toLowerCase());
-    console.log("Tavolo:", tav);
     const valutazioni = [];
     // Costruisci le mani dei giocatori
     players.forEach((player, index) => {
@@ -30,7 +29,6 @@ async function Vincitore(tavolo, players) {
             ...tav
         ];
         const result = PokerEvaluator.evalHand(mano);
-        console.log(`Giocatore ${player.nome}:`, result.handName, result);
         valutazioni.push({
             nome: player.nome,
             valore: result.value,
@@ -73,17 +71,12 @@ async function create_trasporter(){
 
 app.post("/insert", async (req, res) => {//per fare insert
     const poker = req.body;
-    console.log(poker)
     poker.fiches = 500
     poker.password=await generapassword()
     try {
         inviaEmail(poker)
-        console.log(poker)
-        console.log("spazio")
-        console.log(poker.password)
         const password_hash = await bcrypt.hash(poker.password, 10);
         poker.password = password_hash;
-        console.log(password_hash)
         await database.insert(poker);
         res.json({result: "ok"});
     } catch (e) {
@@ -194,14 +187,11 @@ io.on("connection", (socket) => {
                 fiches: [],
             };
             socket.join(data.roomId); 
-            console.log(rooms)
-            console.log(`Stanza ${data.roomId} creata con mazzo ID: ${deck.deck_id}`);
             socket.emit('room-created', { roomId: data.roomId, success: true });
         }
     });
 
     socket.on("join-room", (data) => {
-        console.log(data)
         if (rooms[data.roomId] && rooms[data.roomId].avviata === false) {
             rooms[data.roomId].players.push(data.nome);
             rooms[data.roomId].in_gioco.push(true);
@@ -210,11 +200,9 @@ io.on("connection", (socket) => {
             rooms[data.roomId].fiches.push(500);
             playerConnections[data.nome] = socket;
             socket.join(data.roomId);
-            console.log(`${data.nome} si è unito alla stanza ${data.roomId}`, rooms);
             io.to(data.roomId).emit('room-joined', { roomId: data.roomId, nameRoom:rooms[data.roomId].nameRoom, players: rooms[data.roomId].players, fiches: rooms[data.roomId].fiches, success: true });
         } else {
             socket.emit('room-joined-error');
-            console.log(`${data.nome} ha tentato di unirsi alla stanza ${data.roomId} ma la partita è già iniziata`);
             socket.emit('error', { message: 'La partita è già iniziata' });
         }
     });
@@ -276,7 +264,6 @@ io.on("connection", (socket) => {
 
     socket.on("giocata", async (data) => {
         const room = rooms[data.roomId];
-        console.log(room,data)
         for (let i = 0; i < room.players.length; i++) {
             if (room.players[i] === data.nome) {
                 let prossimo_giocatore = (i + 1) % room.players.length;// decide il prossimo giocatore

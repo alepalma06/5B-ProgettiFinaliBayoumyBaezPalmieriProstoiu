@@ -18,13 +18,11 @@ export const createFormLogin = (parentElement) => {
                 const Nome = document.querySelector("#nome").value;
                 const Password = document.querySelector("#password").value;
                 const outputform = document.querySelector("#outputform")
-                console.log(Nome,Password)
                 if (Nome === "" || Password === "" ) {
                     outputform.innerHTML="ko";
                 }else{
                     try {
                         const data = await login.login(Nome,Password)
-                        console.log(data)
                         if (data === true) {
                             // Se la risposta è positiva, salva il login e prosegui
                             sessionStorage.setItem("login", "true");

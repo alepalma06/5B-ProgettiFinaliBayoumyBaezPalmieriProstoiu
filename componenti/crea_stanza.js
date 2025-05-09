@@ -46,7 +46,6 @@ export const createStanze = (parentElement) => {
                 sessionStorage.setItem("currentRoom", roomId);
 
                 //porta a stanza attesa
-                console.log(`Richiesta creazione stanza ID: ${roomId}`);
 
                 // Reset del campo di input
                 roomName.value = "";
@@ -65,7 +64,6 @@ export const createStanze = (parentElement) => {
                 sessionStorage.setItem("currentRoom", roomId);
                 
                 socket.emit("join-room", { roomId, nome });
-                console.log(`Richiesta unione stanza ID: ${roomId}`);
             });
         },
 

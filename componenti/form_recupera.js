@@ -16,7 +16,6 @@ export const createFormRecupera = (parentElement) => {
             document.querySelector("#buttonrecupera").onclick = async() => {
                 const Nome = document.querySelector("#nomerec").value;
                 const Email = document.querySelector("#emailrec").value;
-                console.log(Nome,Email)
                 const outputform = document.querySelector("#outputformrecupera")
                 if (Nome === "" || Email === "" ) {
                     outputform.innerHTML="Attenzione errore!";

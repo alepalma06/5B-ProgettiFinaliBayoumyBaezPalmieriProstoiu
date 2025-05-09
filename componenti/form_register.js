@@ -16,7 +16,6 @@ export const createFormRegister = (parentElement) => {
             document.querySelector("#buttonregister").onclick = async() => {
                 const Nome = document.querySelector("#nomer").value;
                 const Email = document.querySelector("#email").value;
-                console.log(Nome,Email)
                 const outputform = document.querySelector("#outputformreg")
                 if (Nome === "" || Email === "" ) {
                     outputform.innerHTML="ko";

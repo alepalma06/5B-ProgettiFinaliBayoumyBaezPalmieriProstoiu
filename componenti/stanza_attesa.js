@@ -15,7 +15,6 @@ export const createStanzaAttesa = (parentElement) => {
             document.getElementById("error-message-stanze").innerHTML = "";
 
             window.location.href = "#stanza_attesa";
-            console.log("Sei entrato nella stanza", response);
             let html = template
             html = html.replace("%NOME", response.nameRoom);
             html = html.replace("%CODICE", response.roomId);
@@ -34,7 +33,6 @@ export const createStanzaAttesa = (parentElement) => {
             }
         },
         avvia_partita: (response,socket) => {
-            console.log(`Stanza giocatori: ${response.players}`);
                 
             // Se il numero di giocatori è tra 2 e 6;
             let errorMessage = document.getElementById("error-message");
@@ -46,7 +44,6 @@ export const createStanzaAttesa = (parentElement) => {
     
                 const roomId = sessionStorage.getItem("currentRoom");
                 const codice = sessionStorage.getItem("NAME");
-                console.log("si gioca")
                 // Invoca la funzione per avviare la partita
                 socket.emit("start-game",roomId);        
                 // Distribuisci le carte

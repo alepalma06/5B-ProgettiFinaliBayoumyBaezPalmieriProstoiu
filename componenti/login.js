@@ -18,7 +18,6 @@ export const createLogin=()=>{
         },
         sessionstorage:()=>{
             sessionStorage.setItem("login", "true");
-            console.log("sessionstorage");
         },
         render:(bottone_aggiungi)=>{
             console.log(bottone_aggiungi)

@@ -78,7 +78,6 @@ export const createGiocatore = (parentElement) => {
                 raiseButton.disabled = true;
                 allinButton.disabled = true;
                 socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "fold" , puntata: ultima_puntata });
-                console.log("Fold eseguito");
                 messaggio.innerHTML = "";
             };
 
@@ -89,7 +88,6 @@ export const createGiocatore = (parentElement) => {
                 raiseButton.disabled = true;
                 allinButton.disabled = true;
                 socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "check" , puntata: ultima_puntata });
-                console.log("Check eseguito");
                 messaggio.innerHTML = "";
             };
 
@@ -114,7 +112,6 @@ export const createGiocatore = (parentElement) => {
                 fiches=fiches+ultima_puntata-puntataLibera
                 document.querySelector("#fiches").innerHTML = "Fiches: " + fiches;
                 socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "call" , puntata: puntataLibera });
-                console.log("Call eseguito");
                 messaggio.innerHTML = "";
             };
 
@@ -139,7 +136,6 @@ export const createGiocatore = (parentElement) => {
                 fiches-=puntataLibera
                 document.querySelector("#fiches").innerHTML = "Fiches: " + fiches;
                 socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "raise" , puntata: puntataLibera });
-                console.log("Raise eseguito");
                 messaggio.innerHTML = "";
             };
 
@@ -153,7 +149,6 @@ export const createGiocatore = (parentElement) => {
                 fiches -= puntataLibera;
                 document.querySelector("#fiches").innerHTML = "Fiches: " + fiches;
                 socket.emit("giocata", { roomId: sessionStorage.getItem("currentRoom"), nome: sessionStorage.getItem("NAME"), giocata: "allin" , puntata: puntataLibera });
-                console.log("All In eseguito");
                 messaggio.innerHTML = "";
             };
         },

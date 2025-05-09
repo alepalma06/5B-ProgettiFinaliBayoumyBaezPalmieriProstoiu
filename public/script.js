@@ -105,7 +105,6 @@ async function initialize() {
                 console.log("Partita iniziata è il turno di: ",response.primo);
                 window.location.href = "#partita";
                 const nome = sessionStorage.getItem("NAME");
-                console.log(nome)
                 const puntate_iniziali = []
                 response.giocatori.forEach(player =>{
                     puntate_iniziali.push({nome:player,puntata:0})
@@ -144,15 +143,12 @@ async function initialize() {
         });
         
         socket.on('room-informed', (response) => {
-            console.log(response)
             if ( response.success) {
                 StanzaAttesa.avvia_partita(response,socket);
             }
         });
         
         socket.on("turno", (response) => {
-            console.log(response)
-            console.log("è il turno di: ",response.nome);
             const ultima_puntata= response.ultima_puntata.toString()
             const nome = sessionStorage.getItem("NAME");
             if (ultima_puntata.includes("fold")){
@@ -175,14 +171,12 @@ async function initialize() {
                 const carta_tavolo = tavolo.querySelectorAll(".cartecoperte")[index];
                 if (carta_tavolo) {
                     carta_tavolo.className = "cartescoperte"; // cambia la classe
-                    console.log(carta)
                     carta_tavolo.src = carta.image; // imposta il nuovo src (assicurati che carta.img sia corretto)
                 }
             });
         });
         
         socket.on("fine-partita", (response) => {
-            console.log(response);
             let name = sessionStorage.getItem("NAME")
             let players = Object.entries(response.carte_giocatori).map(([nome, carte]) => {
             return {
